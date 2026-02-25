@@ -1,4 +1,4 @@
-package com.alvaro.garmin.entity;
+package com.alvaro.enduremetrics.entity;
 
 import java.time.LocalDate; // Añadido para la fecha
 import java.util.ArrayList;

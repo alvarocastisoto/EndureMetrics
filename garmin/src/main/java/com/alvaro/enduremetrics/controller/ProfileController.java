@@ -1,12 +1,13 @@
-package com.alvaro.garmin.controller;
+package com.alvaro.enduremetrics.controller;
 
-import com.alvaro.garmin.entity.Usuario;
-import com.alvaro.garmin.session.UserSession;
 import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.springframework.stereotype.Controller;
+
+import com.alvaro.enduremetrics.session.UserSession;
+import com.alvaro.enduremetrics.entity.Usuario;
 
 import java.time.LocalDate;
 

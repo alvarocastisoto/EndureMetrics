@@ -1,9 +1,11 @@
-package com.alvaro.garmin.service;
+package com.alvaro.enduremetrics.service;
 
-import com.alvaro.garmin.entity.Usuario;
-import com.alvaro.garmin.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import com.alvaro.enduremetrics.entity.Usuario;
+import com.alvaro.enduremetrics.repository.UsuarioRepository;
+
 import org.mindrot.jbcrypt.BCrypt;
 
 @Service

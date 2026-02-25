@@ -1,13 +1,13 @@
-package com.alvaro.garmin.controller;
+package com.alvaro.enduremetrics.controller;
 
 import java.io.IOException;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
-import com.alvaro.garmin.entity.Usuario;
-import com.alvaro.garmin.service.LoginService;
-import com.alvaro.garmin.session.UserSession;
+import com.alvaro.enduremetrics.entity.Usuario;
+import com.alvaro.enduremetrics.service.LoginService;
+import com.alvaro.enduremetrics.session.UserSession;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

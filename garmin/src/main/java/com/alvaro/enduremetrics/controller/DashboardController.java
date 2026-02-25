@@ -1,9 +1,10 @@
-package com.alvaro.garmin.controller;
+package com.alvaro.enduremetrics.controller;
 
-import com.alvaro.garmin.session.UserSession;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.springframework.stereotype.Controller;
+
+import com.alvaro.enduremetrics.session.UserSession;
 
 @Controller
 public class DashboardController {

@@ -1,8 +1,8 @@
-package com.alvaro.garmin.session;
+package com.alvaro.enduremetrics.session;
 
 import org.springframework.stereotype.Component;
 
-import com.alvaro.garmin.entity.Usuario;
+import com.alvaro.enduremetrics.entity.Usuario;
 
 @Component
 public class UserSession {

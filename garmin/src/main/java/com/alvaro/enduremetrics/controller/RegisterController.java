@@ -1,7 +1,4 @@
-package com.alvaro.garmin.controller;
-
-import com.alvaro.garmin.service.RegisterService;
-import com.alvaro.garmin.entity.Usuario;
+package com.alvaro.enduremetrics.controller;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
@@ -19,6 +16,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.control.DatePicker;
 import org.springframework.stereotype.Controller;
+
+import com.alvaro.enduremetrics.entity.Usuario;
+import com.alvaro.enduremetrics.service.RegisterService;
 
 import java.io.IOException;
 import java.time.LocalDate;

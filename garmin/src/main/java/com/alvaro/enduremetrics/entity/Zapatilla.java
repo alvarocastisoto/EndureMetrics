@@ -1,4 +1,4 @@
-package com.alvaro.garmin.entity;
+package com.alvaro.enduremetrics.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

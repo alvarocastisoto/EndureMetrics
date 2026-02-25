@@ -1,4 +1,4 @@
-package com.alvaro.garmin;
+package com.alvaro.enduremetrics;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -9,8 +9,6 @@ import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 
 @SpringBootApplication
@@ -34,7 +32,7 @@ public class GarminApplication extends Application {
 		fxmlLoader.setControllerFactory(springContext::getBean);
 		Parent root = fxmlLoader.load();
 		Scene scene = new Scene(root);
-		stage.setTitle("Garmin Data Viewer");
+		stage.setTitle("EndureMetrics");
 		stage.setScene(scene);
 		stage.show();
 	}

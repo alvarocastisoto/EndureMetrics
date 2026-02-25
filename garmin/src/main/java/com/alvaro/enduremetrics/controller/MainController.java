@@ -1,6 +1,5 @@
-package com.alvaro.garmin.controller;
+package com.alvaro.enduremetrics.controller;
 
-import com.alvaro.garmin.session.UserSession;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -15,6 +14,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
+
+import com.alvaro.enduremetrics.session.UserSession;
+
 import java.io.IOException;
 import javafx.scene.layout.AnchorPane;
 

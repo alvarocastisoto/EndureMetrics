@@ -1,8 +1,9 @@
-package com.alvaro.garmin.repository;
+package com.alvaro.enduremetrics.repository;
 
-import com.alvaro.garmin.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.alvaro.enduremetrics.entity.Usuario;
 
 import java.util.Optional;
 import java.util.UUID;
