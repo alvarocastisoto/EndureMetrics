@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="500.0" prefWidth="700.0" stylesheets="@../css/styles.css"
+    xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.alvaro.garmin.controller.LoginController">
+
+    <VBox fx:id="tarjetaLogin" alignment="CENTER" maxWidth="450.0" maxHeight="420.0" spacing="20.0"
+        styleClass="card-form">
+        <padding>
+            <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+        </padding>
+        <children>
+            <Label text="Better Than Garmin" textFill="#1a202c">
+                <font>
+                    <Font name="System Bold" size="32.0" />
+                </font>
+            </Label>
+
+            <VBox alignment="CENTER_LEFT" spacing="5.0">
+                <Label text="Usuario" textFill="#4a5568">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="usernameField" promptText="Tu nombre de usuario" />
+            </VBox>
+
+            <VBox alignment="CENTER_LEFT" spacing="5.0">
+                <Label text="Contraseña" textFill="#4a5568">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Label>
+                <PasswordField fx:id="passwordField" promptText="••••••" />
+            </VBox>
+
+            <Label fx:id="errorLabel" textFill="#e53e3e" visible="false" wrapText="true">
+                <font>
+                    <Font name="System Bold" size="13.0" />
+                </font>
+            </Label>
+
+            <HBox alignment="CENTER" spacing="15.0">
+                <Button onAction="#onLoginClick" defaultButton="true" prefHeight="40.0"
+                    prefWidth="140.0"
+                    styleClass="success" text="Log in">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+                <Button onAction="#irAlRegistro" prefHeight="40.0" prefWidth="140.0"
+                    text="Registrarse" />
+            </HBox>
+        </children>
+    </VBox>
+</StackPane>

@@ -1,0 +1,29 @@
+/* src/main/resources/css/styles.css */
+
+/* 1. Fondo de la aplicación: un gris muy sutil (#f3f4f6) para que la tarjeta destaque */
+.root { -fx-background-color: #f1f5f9; }
+/* 2. La Tarjeta Flotante Premium: fondo blanco, curvas suaves y sombra estilo web */
+.card-form {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 5);
+}
+.success { -fx-base: #27ae60; }
+.danger { -fx-base: #e74c3c; -fx-text-fill: white; }
+.accent { -fx-base: #3498db; -fx-text-fill: white; }
+/* 3. Animación y borde rojo para cuando el usuario se equivoca al registrarse */
+.error-field {
+    -fx-border-color: #e74c3c !important;
+    -fx-effect: dropshadow(gaussian, rgba(231, 76, 60, 0.3), 5, 0, 0, 0) !important;
+}
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+}
+
+/* * NOTA DE ARQUITECTURA: 
+ * Ni las cajas de texto, ni el calendario, ni el botón verde (.success) necesitan 
+ * código extra. AtlantaFX (PrimerLight) ya tiene los degradados y proporciones 
+ * matemáticamente perfectas de GitHub incrustadas de forma nativa.
+ */
