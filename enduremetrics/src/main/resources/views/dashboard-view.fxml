@@ -8,7 +8,7 @@
     stylesheets="@../css/styles.css"
     xmlns="http://javafx.com/javafx/21"
     xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.alvaro.garmin.controller.DashboardController">
+    fx:controller="com.alvaro.enduremetrics.controller.DashboardController">
 
     <Label fx:id="bienvenidaLabel" text="Cargando datos..." textFill="#2c3e50">
         <font>

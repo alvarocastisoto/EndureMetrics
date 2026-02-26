@@ -39,16 +39,13 @@ public class ProfileController {
             Usuario usuario = userSession.getUsuarioLogueado();
             usernameField.setText(usuario.getUsername());
 
-            // TODO: Descomentar cuando la entidad Usuario tenga estos atributos
-            /*
-             * if (usuario.getPeso() != null)
-             * pesoField.setText(usuario.getPeso().toString());
-             * if (usuario.getAltura() != null)
-             * alturaField.setText(usuario.getAltura().toString());
-             * if (usuario.getFcm() != null) fcmField.setText(usuario.getFcm().toString());
-             * if (usuario.getFechaNacimiento() != null)
-             * fechaNacimientoPicker.setValue(usuario.getFechaNacimiento());
-             */
+            // if (usuario.getPeso().toString() != null)
+            // pesoField.setText(usuario.getPeso().toString());
+            if (usuario.getAltura() != null) {
+                alturaField.setText(usuario.getAltura().toString());
+            }
+            if (usuario.getFechaNacimiento() != null)
+                fechaNacimientoPicker.setValue(usuario.getFechaNacimiento());
         }
     }
 

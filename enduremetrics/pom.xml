@@ -21,6 +21,8 @@
 		<java.version>17</java.version>
 		<javafx.version>21.0.2</javafx.version>
 		<atlantafx.version>2.0.1</atlantafx.version>
+		<tilesfx.version>17.1.17</tilesfx.version>
+		<jenetics.version>1.7.0</jenetics.version>
 	</properties>
 
 	<dependencies>

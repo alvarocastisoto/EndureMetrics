@@ -18,7 +18,7 @@
 
 <StackPane stylesheets="@../css/styles.css" prefHeight="800.0" prefWidth="700.0"
     xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.alvaro.garmin.controller.RegisterController">
+    fx:controller="com.alvaro.enduremetrics.controller.RegisterController">
 
     <VBox fx:id="tarjetaFormulario" alignment="CENTER" maxWidth="550.0" maxHeight="720.0"
         spacing="12.0"
