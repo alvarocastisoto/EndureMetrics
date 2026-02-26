@@ -13,78 +13,79 @@
 <?import javafx.scene.text.Font?>
 
 <HBox alignment="TOP_CENTER" spacing="30.0" stylesheets="@../css/styles.css"
-    xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.alvaro.enduremetrics.controller.ProfileController">
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.alvaro.enduremetrics.controller.ProfileController">
 
     <VBox spacing="20.0" prefWidth="380.0" styleClass="card-form">
         <padding>
-            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
         </padding>
         <Label text="Perfil del Atleta" textFill="#1e293b">
             <font>
-                <Font name="System Bold" size="24.0" />
+                <Font name="System Bold" size="24.0"/>
             </font>
         </Label>
 
         <VBox spacing="5.0">
             <Label text="Usuario" textFill="#64748b">
                 <font>
-                    <Font name="System Bold" size="12.0" />
+                    <Font name="System Bold" size="12.0"/>
                 </font>
             </Label>
-            <TextField fx:id="usernameField" disable="true" />
+            <TextField fx:id="usernameField" disable="true"/>
         </VBox>
 
         <HBox spacing="15.0">
             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                 <Label text="Altura (cm)" textFill="#64748b">
                     <font>
-                        <Font name="System Bold" size="12.0" />
+                        <Font name="System Bold" size="12.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="alturaField" />
+                <TextField fx:id="alturaField"/>
             </VBox>
             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                 <Label text="Sexo" textFill="#64748b">
                     <font>
-                        <Font name="System Bold" size="12.0" />
+                        <Font name="System Bold" size="12.0"/>
                     </font>
                 </Label>
-                <ComboBox fx:id="sexoComboBox" maxWidth="1.7976931348623157E308" />
+                <ComboBox fx:id="sexoComboBox" maxWidth="1.7976931348623157E308">
+                </ComboBox>
             </VBox>
         </HBox>
 
         <VBox spacing="5.0">
             <Label text="Fecha de Nacimiento" textFill="#64748b">
                 <font>
-                    <Font name="System Bold" size="12.0" />
+                    <Font name="System Bold" size="12.0"/>
                 </font>
             </Label>
-            <DatePicker fx:id="fechaNacimientoPicker" maxWidth="1.7976931348623157E308" />
+            <DatePicker fx:id="fechaNacimientoPicker" maxWidth="1.7976931348623157E308"/>
         </VBox>
 
         <Button onAction="#guardarPerfil" maxWidth="1.7976931348623157E308" styleClass="accent"
-            text="Actualizar Perfil" />
+                text="Actualizar Perfil"/>
     </VBox>
 
     <VBox spacing="15.0" HBox.hgrow="ALWAYS" styleClass="card-form">
         <padding>
-            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
         </padding>
         <HBox alignment="CENTER_LEFT">
             <Label text="Mi Armario" textFill="#1e293b">
                 <font>
-                    <Font name="System Bold" size="24.0" />
+                    <Font name="System Bold" size="24.0"/>
                 </font>
             </Label>
-            <VBox HBox.hgrow="ALWAYS" />
-            <Button onAction="#abrirModalNuevaZapatilla" styleClass="success" text="+ Zapatillas" />
+            <VBox HBox.hgrow="ALWAYS"/>
+            <Button onAction="#abrirModalNuevaZapatilla" styleClass="success" text="+ Zapatillas"/>
         </HBox>
         <TableView fx:id="zapatillasTable" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colMarcaModelo" prefWidth="200.0" text="Modelo" />
-                <TableColumn fx:id="colKm" prefWidth="100.0" text="Kilómetros" />
-                <TableColumn fx:id="colEstado" prefWidth="100.0" text="Estado" />
+                <TableColumn fx:id="colMarcaModelo" prefWidth="200.0" text="Modelo"/>
+                <TableColumn fx:id="colKm" prefWidth="100.0" text="Kilómetros"/>
+                <TableColumn fx:id="colEstado" prefWidth="100.0" text="Estado"/>
             </columns>
         </TableView>
     </VBox>

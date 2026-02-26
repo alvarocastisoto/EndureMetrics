@@ -1,9 +1,13 @@
 package com.alvaro.enduremetrics.controller;
 
+import com.alvaro.enduremetrics.dto.ProfileDTO;
+import com.alvaro.enduremetrics.service.ProfileService;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.alvaro.enduremetrics.session.UserSession;
@@ -28,24 +32,42 @@ public class ProfileController {
     private DatePicker fechaNacimientoPicker;
     @FXML
     private Label mensajeLabel;
+    @FXML
+    private ComboBox <String>sexoComboBox;
 
     public ProfileController(UserSession userSession) {
         this.userSession = userSession;
     }
 
+    @Autowired
+    private ProfileService profileService;
+
     @FXML
     public void initialize() {
-        if (userSession.haySesionActiva()) {
-            Usuario usuario = userSession.getUsuarioLogueado();
-            usernameField.setText(usuario.getUsername());
 
-            // if (usuario.getPeso().toString() != null)
-            // pesoField.setText(usuario.getPeso().toString());
-            if (usuario.getAltura() != null) {
-                alturaField.setText(usuario.getAltura().toString());
+        sexoComboBox.getItems().addAll(
+                "Hombre",
+                "Mujer",
+                "Otro",
+                "Prefiero no decirlo"
+        );
+        if (userSession.haySesionActiva()) {
+            // Pedimos el DTO al servicio
+            ProfileDTO perfil = profileService.obtenerPerfil(userSession.getUsuarioLogueado());
+
+            // Rellenamos la UI
+            usernameField.setText(perfil.username()); // Nota: es username(), no getUsername()
+
+            if (perfil.altura() != null) {
+                alturaField.setText(perfil.altura().toString());
             }
-            if (usuario.getFechaNacimiento() != null)
-                fechaNacimientoPicker.setValue(usuario.getFechaNacimiento());
+
+            if (perfil.fechaNacimiento() != null) {
+                fechaNacimientoPicker.setValue(perfil.fechaNacimiento());
+            }
+            if (perfil.sexo() != null) {
+                sexoComboBox.setValue(perfil.sexo());
+            }
         }
     }
 
