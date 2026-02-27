@@ -86,7 +86,7 @@ public class LoginController {
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.sizeToScene();
+            stage.setMaximized(true);
             stage.centerOnScreen();
 
         } catch (IllegalArgumentException e) {

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.control.CheckBox?>
+<VBox alignment="TOP_CENTER" prefWidth="400.0" spacing="20.0" stylesheets="@../css/styles.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.alvaro.enduremetrics.controller.ZapatillaModalController"
+      styleClass="card-form">
+
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <Label text="Nueva Zapatilla" textFill="#1e293b">
+        <font>
+            <Font name="System Bold" size="22.0" />
+        </font>
+    </Label>
+
+    <HBox spacing="15.0">
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="Marca" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <TextField fx:id="marcaField" promptText="Ej: Nike, Asics..." />
+        </VBox>
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="Modelo" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <TextField fx:id="modeloField" promptText="Ej: Pegasus 40" />
+        </VBox>
+    </HBox>
+
+    <HBox spacing="15.0">
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="Km Actuales" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <TextField fx:id="kmActualesField" text="0.0" />
+        </VBox>
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="Km Máximos" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <TextField fx:id="kmMaximosField" promptText="Ej: 800" />
+        </VBox>
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="Tipo de Terreno" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <ComboBox fx:id="terrenoComboBox" maxWidth="1.7976931348623157E308" promptText="Selecciona terreno..." />
+        </VBox>
+
+        <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="Uso" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <CheckBox fx:id="activaCheckBox" selected="true" text="Activa (Principal)" textFill="#1e293b" />
+        </VBox>
+    </HBox>
+
+    <Label fx:id="mensajeLabel" visible="false">
+        <font>
+            <Font size="13.0" />
+        </font>
+    </Label>
+
+    <HBox alignment="CENTER_RIGHT" spacing="15.0">
+        <Button mnemonicParsing="false" onAction="#cerrarModal" styleClass="secondary-button" text="Cancelar" />
+        <Button mnemonicParsing="false" onAction="#guardarZapatilla" styleClass="accent" text="Guardar Zapatilla" />
+    </HBox>
+
+</VBox>

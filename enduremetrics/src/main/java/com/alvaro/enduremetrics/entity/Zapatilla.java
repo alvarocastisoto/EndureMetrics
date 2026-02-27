@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "zapatillas")
 @Getter
@@ -22,13 +24,13 @@ public class Zapatilla {
 
     // Control de desgaste
     private Double kmActuales = 0.0;
-    private Double kmMaximos = 600.0; // Valor por defecto seguro
+    private Double kmMaximos = 800.0; // Valor por defecto seguro
 
     // Para la auto-asignación inteligente que comentamos
     private String tipoTerreno; // "Asfalto", "Trail", "Pista"
 
     // Si ya no se usan (jubiladas) pero queremos mantener el historial
-    private boolean activa = true;
+    private Boolean activa = true;
 
     // Relación: Muchas zapatillas pertenecen a un Usuario
     @ManyToOne(fetch = FetchType.LAZY)

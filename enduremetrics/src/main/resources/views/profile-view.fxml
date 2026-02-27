@@ -45,14 +45,25 @@
                 <TextField fx:id="alturaField"/>
             </VBox>
             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="Peso (kg)" textFill="#64748b">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="pesoField"/>
+            </VBox>
+        </HBox>
+
+        <HBox spacing="15.0">
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                 <Label text="Sexo" textFill="#64748b">
                     <font>
                         <Font name="System Bold" size="12.0"/>
                     </font>
                 </Label>
-                <ComboBox fx:id="sexoComboBox" maxWidth="1.7976931348623157E308">
-                </ComboBox>
+                <ComboBox fx:id="sexoComboBox" maxWidth="1.7976931348623157E308"/>
             </VBox>
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS"/>
         </HBox>
 
         <VBox spacing="5.0">
@@ -64,6 +75,12 @@
             <DatePicker fx:id="fechaNacimientoPicker" maxWidth="1.7976931348623157E308"/>
         </VBox>
 
+        <Label fx:id="mensajeLabel" visible="false">
+            <font>
+                <Font size="13.0" />
+            </font>
+        </Label>
+
         <Button onAction="#guardarPerfil" maxWidth="1.7976931348623157E308" styleClass="accent"
                 text="Actualizar Perfil"/>
     </VBox>
@@ -72,20 +89,24 @@
         <padding>
             <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
         </padding>
-        <HBox alignment="CENTER_LEFT">
+
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="Mi Armario" textFill="#1e293b">
                 <font>
                     <Font name="System Bold" size="24.0"/>
                 </font>
             </Label>
             <VBox HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnEliminarZapatilla" disable="true" onAction="#eliminarZapatilla" styleClass="danger-button" text="🗑 Eliminar"/>
             <Button onAction="#abrirModalNuevaZapatilla" styleClass="success" text="+ Zapatillas"/>
         </HBox>
+
         <TableView fx:id="zapatillasTable" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="colMarcaModelo" prefWidth="200.0" text="Modelo"/>
-                <TableColumn fx:id="colKm" prefWidth="100.0" text="Kilómetros"/>
-                <TableColumn fx:id="colEstado" prefWidth="100.0" text="Estado"/>
+                <TableColumn fx:id="colKm" prefWidth="90.0" text="Km Actuales"/>
+                <TableColumn fx:id="colKmMaximos" prefWidth="90.0" text="Km Máximos"/>
+                <TableColumn fx:id="colEstado" prefWidth="90.0" text="Estado"/>
             </columns>
         </TableView>
     </VBox>

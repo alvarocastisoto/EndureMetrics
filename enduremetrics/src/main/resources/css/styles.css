@@ -21,7 +21,92 @@
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
 }
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0; /* Borde gris muy suave */
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-background-radius: 8px;
+}
 
+/* 2. Ocultar las feas líneas verticales de la cuadrícula */
+.table-view .table-cell {
+    -fx-border-color: transparent transparent #f1f5f9 transparent; /* Solo línea horizontal debajo */
+    -fx-padding: 10px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #334155;
+}
+
+/* 3. Área de las cabeceras (Arriba) */
+.table-view .column-header-background {
+    -fx-background-color: #f8fafc; /* Gris casi blanco */
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* 4. Cada cabecera individual */
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-size: 45px; /* Cabeceras más altas para que respire */
+}
+
+/* 5. Texto de las cabeceras */
+.table-view .column-header .label {
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 0 0 0 5px;
+}
+
+/* 6. Altura y fondo de las filas */
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-cell-size: 45px; /* Filas más anchas, mejor legibilidad */
+}
+
+/* 7. Efecto Hover (Cuando pasas el ratón) - Clave para la UX */
+.table-row-cell:hover {
+    -fx-background-color: #f8fafc;
+    -fx-cursor: hand;
+}
+
+/* 8. Fila seleccionada (Cambia el azul feo por uno profesional) */
+.table-row-cell:selected {
+    -fx-background-color: #e0f2fe; /* Azul pastel muy claro */
+    -fx-background-insets: 0;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #0369a1; /* Texto azul oscuro al seleccionar */
+    -fx-font-weight: bold;
+}
+
+/* 9. Limpiar las barras de scroll */
+.table-view .scroll-bar:horizontal .track,
+.table-view .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+}
+
+.table-view .scroll-bar:horizontal .thumb,
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 5px;
+}
+
+.danger-button {
+    -fx-background-color: #ef4444; /* Rojo Tailwind */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+}
+.danger-button:hover {
+    -fx-background-color: #dc2626; /* Rojo más oscuro al pasar el ratón */
+    -fx-cursor: hand;
+}
 /* * NOTA DE ARQUITECTURA: 
  * Ni las cajas de texto, ni el calendario, ni el botón verde (.success) necesitan 
  * código extra. AtlantaFX (PrimerLight) ya tiene los degradados y proporciones 
