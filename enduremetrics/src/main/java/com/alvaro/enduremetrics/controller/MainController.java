@@ -4,6 +4,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import com.alvaro.enduremetrics.session.UserSession;
 
 import java.io.IOException;
+
 import javafx.scene.layout.AnchorPane;
 
 @Controller
@@ -125,4 +127,6 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
+    public void conectarInvervals() {cargarVista("/views/intervals-view.fxml");}
 }

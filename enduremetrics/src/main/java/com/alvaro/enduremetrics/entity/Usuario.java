@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List; // Añadido para que no rompa la compilación
 import java.util.UUID;
 
+import com.alvaro.enduremetrics.util.StringCryptoConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,9 @@ public class Usuario {
     private Integer altura;
     private LocalDate fechaNacimiento;
     private String sexo;
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private IntervalsCredentials intervalsCredentials;
 
     // --- INVENTARIO DE MATERIAL ---
     // Si borramos al usuario, se borran sus zapatillas (CascadeType.ALL)

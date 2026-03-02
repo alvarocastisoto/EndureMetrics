@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="20.0" stylesheets="@../css/styles.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.alvaro.enduremetrics.controller.IntervalsController">
+
+    <VBox maxWidth="500.0" spacing="20.0" styleClass="card-form">
+        <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+        </padding>
+
+        <Label text="Vincular Intervals.icu" textFill="#1e293b">
+            <font>
+                <Font name="System Bold" size="24.0"/>
+            </font>
+        </Label>
+
+        <Label text="Para sincronizar tus entrenamientos, necesitamos tu ID de atleta y tu API Key. Puedes encontrarlos en la página de Configuración (Settings) de tu cuenta de Intervals." textFill="#64748b" wrapText="true"/>
+
+        <VBox spacing="5.0">
+            <Label text="Athlete ID" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0"/>
+                </font>
+            </Label>
+            <TextField fx:id="athleteIdField" promptText="Ej: i123456"/>
+        </VBox>
+
+        <VBox spacing="5.0">
+            <Label text="API Key" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="12.0"/>
+                </font>
+            </Label>
+            <PasswordField fx:id="apiKeyField" promptText="Pega aquí tu API Key secreta"/>
+        </VBox>
+
+        <Label fx:id="mensajeLabel" visible="false">
+            <font>
+                <Font size="13.0"/>
+            </font>
+        </Label>
+
+        <Button onAction="#conectarIntervals" maxWidth="1.7976931348623157E308" styleClass="accent" text="Validar y Conectar"/>
+    </VBox>
+
+</VBox>
