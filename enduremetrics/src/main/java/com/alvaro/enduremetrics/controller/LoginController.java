@@ -2,6 +2,7 @@ package com.alvaro.enduremetrics.controller;
 
 import java.io.IOException;
 
+import com.alvaro.enduremetrics.service.IntervalsService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
@@ -24,11 +25,12 @@ public class LoginController {
     private final ApplicationContext springContext;
     private final LoginService loginService;
     private final UserSession userSession;
-
-    public LoginController(ApplicationContext springContext, LoginService loginService, UserSession userSession) {
+    private final IntervalsService intervalsService;
+    public LoginController(ApplicationContext springContext, LoginService loginService, UserSession userSession, IntervalsService intervalsService) {
         this.springContext = springContext;
         this.loginService = loginService;
         this.userSession = userSession;
+        this.intervalsService = intervalsService;
     }
 
     @FXML
@@ -78,6 +80,7 @@ public class LoginController {
             Usuario usuarioLogueado = loginService.validarCredenciales(usernameField.getText(),
                     passwordField.getText());
             userSession.setUsuarioLogueado(usuarioLogueado);
+            intervalsService.sincronizacionBackground(usuarioLogueado);
             errorLabel.setTextFill(javafx.scene.paint.Color.web("#27ae60")); // Verde éxito
             mostrarError(null, "¡Conectando...");
 

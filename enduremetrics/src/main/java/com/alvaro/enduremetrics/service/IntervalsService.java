@@ -2,11 +2,13 @@ package com.alvaro.enduremetrics.service;
 
 import com.alvaro.enduremetrics.dto.intervals.IntervalsAthleteDTO;
 import com.alvaro.enduremetrics.dto.intervals.IntervalsDTO;
+import com.alvaro.enduremetrics.dto.intervals.IntervalsUpdateProfileDTO;
 import com.alvaro.enduremetrics.entity.IntervalsCredentials;
 import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.repository.IntervalsRepository;
 import com.alvaro.enduremetrics.repository.UsuarioRepository;
 import com.alvaro.enduremetrics.session.UserSession;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
@@ -91,4 +93,72 @@ public class IntervalsService {
         return credentialsRepository.findByUsuario(usuarioGestionado)
                 .map(creds -> new IntervalsDTO(creds.getIntervalsId(), creds.getIntervalsApiKey()));
     }
+
+
+    @Transactional
+    public void sincronizarDatosAtleta(Usuario usuarioSession, IntervalsAthleteDTO atletaDTO) {
+        Usuario usuarioGestionado = usuarioRepository.findByUsername(usuarioSession.getUsername()).orElseThrow(()
+                -> new RuntimeException("Usuario no encontrado en la base de datos"));
+
+        boolean hayCambios = false;
+
+        if (atletaDTO.peso() != null && atletaDTO.peso() > 0) {
+            usuarioGestionado.setPeso(atletaDTO.peso());
+            hayCambios = true;
+            System.out.println("Sincronizando peso desde Intervals: " + atletaDTO.peso());
+        }
+
+        if (hayCambios) {
+            usuarioRepository.save(usuarioGestionado);
+            userSession.setUsuarioLogueado(usuarioGestionado);
+        }
+    }
+
+
+    @Async
+    @Transactional
+    public void sincronizacionBackground(Usuario usuarioSession) {
+
+        try {
+            System.out.println("Iniciando sincronización en segundo plano");
+
+            obtenerCredenciales(usuarioSession).ifPresent(creds -> {
+                IntervalsAthleteDTO atleta = probarConexion(usuarioSession);
+                sincronizarDatosAtleta(usuarioSession, atleta);
+                System.out.println("Sincronización completada con éxito");
+            });
+        } catch (Exception e) {
+            System.out.println("Error al sincronizar en segundo plano: " + e.getMessage());
+        }
+
+    }
+
+
+    @Async
+    @Transactional
+    public void actualizarPerfilIntervals(Usuario usuarioSession, Double nuevoPeso) {
+        try {
+            obtenerCredenciales(usuarioSession).ifPresent(creds -> {
+                String authRaw = "API_KEY:" + creds.apiKey();
+                String encodedAuth = Base64.getEncoder().encodeToString(authRaw.getBytes());
+                IntervalsUpdateProfileDTO updateDTO = new IntervalsUpdateProfileDTO(nuevoPeso);
+                System.out.println("Subiendo nuevo perfil");
+
+                // Usamos PUT para sobreescribir datos existentes
+                restClient.put()
+                        .uri("/athlete/{id}", creds.athleteId())
+                        .header("Authorization", "Basic " + encodedAuth)
+                        .body(updateDTO) // Spring convierte el DTO a JSON automáticamente
+                        .retrieve()
+                        .toBodilessEntity();
+                System.out.println("Perfil actualizado");
+
+            });
+
+
+        } catch (Exception e) {
+            System.err.println("[PUSH ERROR] No se pudo actualizar el perfil en Intervals: " + e.getMessage());
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package com.alvaro.enduremetrics.controller;
 import com.alvaro.enduremetrics.dto.ProfileDTO;
 import com.alvaro.enduremetrics.entity.Zapatilla;
 import com.alvaro.enduremetrics.repository.ZapatillasRepository;
+import com.alvaro.enduremetrics.service.IntervalsService;
 import com.alvaro.enduremetrics.service.ProfileService;
 import com.alvaro.enduremetrics.service.ZapatillasService;
 import com.alvaro.enduremetrics.session.UserSession;
@@ -59,14 +60,15 @@ public class ProfileController {
     private TableColumn<Zapatilla, Double> colKmMaximos;
     private final ZapatillasService zapatillasService;
     private final ZapatillasRepository zapatillasRepository;
-
-    public ProfileController(UserSession userSession, ProfileService profileService, ApplicationContext springContext, ZapatillasService zapatillasService, ZapatillasRepository zapatillasRepository) {
+    private final IntervalsService intervalsService;
+    public ProfileController(UserSession userSession, ProfileService profileService, ApplicationContext springContext, ZapatillasService zapatillasService, ZapatillasRepository zapatillasRepository, IntervalsService intervalsService) {
         this.userSession = userSession;
         this.profileService = profileService;
         this.springContext = springContext;
         this.zapatillasService = zapatillasService;
 
         this.zapatillasRepository = zapatillasRepository;
+        this.intervalsService = intervalsService;
     }
 
     @FXML
@@ -108,7 +110,7 @@ public class ProfileController {
 
             // Delegamos el guardado en la base de datos a la capa de servicio
             profileService.actualizarPerfil(userSession.getUsuarioLogueado(), datosActualizados);
-
+            intervalsService.actualizarPerfilIntervals(userSession.getUsuarioLogueado(), peso);
             // Asumiendo que has creado este método en ViewUtils para cambiar textos de Labels
             ViewUtils.mostrarMensaje(mensajeLabel, "Perfil actualizado correctamente", "#27ae60");
 
