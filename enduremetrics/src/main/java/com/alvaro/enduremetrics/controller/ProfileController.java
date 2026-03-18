@@ -61,6 +61,7 @@ public class ProfileController {
     private final ZapatillasService zapatillasService;
     private final ZapatillasRepository zapatillasRepository;
     private final IntervalsService intervalsService;
+
     public ProfileController(UserSession userSession, ProfileService profileService, ApplicationContext springContext, ZapatillasService zapatillasService, ZapatillasRepository zapatillasRepository, IntervalsService intervalsService) {
         this.userSession = userSession;
         this.profileService = profileService;
@@ -101,16 +102,19 @@ public class ProfileController {
         try {
             // Parseamos los Strings a Integer de forma segura
             Double peso = parsearNumero(pesoField.getText(), Double::valueOf);
-            Integer altura = parsearNumero(alturaField.getText(), Integer::valueOf);
+            Double altura = parsearNumero(alturaField.getText(), Double::valueOf); // <-- Cambiado a Double
             LocalDate fechaNac = fechaNacimientoPicker.getValue();
             String sexo = sexoComboBox.getValue();
 
-            // Montamos el DTO con los datos limpios (Asegúrate de tener estos campos en tu ProfileDTO)
-            ProfileDTO datosActualizados = new ProfileDTO(userSession.getUsuarioLogueado().getUsername(), altura, fechaNac, sexo, peso);
+            // Montamos el DTO de base de datos
+            ProfileDTO datosActualizados = new ProfileDTO(userSession.getUsuarioLogueado().getUsername(),
+                    (altura != null ? altura.intValue() : null), fechaNac, sexo, peso);
 
-            // Delegamos el guardado en la base de datos a la capa de servicio
+            // Guardamos localmente
             profileService.actualizarPerfil(userSession.getUsuarioLogueado(), datosActualizados);
-            intervalsService.actualizarPerfilIntervals(userSession.getUsuarioLogueado(), peso);
+
+            // Subimos a Intervals (Le pasamos la variable altura limpia)
+            intervalsService.actualizarPerfilIntervals(userSession.getUsuarioLogueado(), peso, altura, fechaNac, sexo);
             // Asumiendo que has creado este método en ViewUtils para cambiar textos de Labels
             ViewUtils.mostrarMensaje(mensajeLabel, "Perfil actualizado correctamente", "#27ae60");
 

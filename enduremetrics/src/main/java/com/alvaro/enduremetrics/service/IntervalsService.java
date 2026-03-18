@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.time.LocalDate;
 import java.util.Base64;
 
 @Service
@@ -135,27 +136,34 @@ public class IntervalsService {
 
 
     @Async
-    @Transactional
-    public void actualizarPerfilIntervals(Usuario usuarioSession, Double nuevoPeso) {
+    public void actualizarPerfilIntervals(Usuario usuarioSession, Double nuevoPeso, Double altura, LocalDate fechaNacimiento, String sexoUi) {
         try {
             obtenerCredenciales(usuarioSession).ifPresent(creds -> {
                 String authRaw = "API_KEY:" + creds.apiKey();
                 String encodedAuth = Base64.getEncoder().encodeToString(authRaw.getBytes());
-                IntervalsUpdateProfileDTO updateDTO = new IntervalsUpdateProfileDTO(nuevoPeso);
-                System.out.println("Subiendo nuevo perfil");
 
-                // Usamos PUT para sobreescribir datos existentes
+                // 1. Convertimos centímetros a metros
+                Double alturaApi = (altura != null) ? altura / 100.0 : null;
+
+                // 2. Traducimos el idioma
+                String sexoApi = null;
+                if ("Hombre".equals(sexoUi)) sexoApi = "M";
+                else if ("Mujer".equals(sexoUi)) sexoApi = "F";
+
+                // 3. Pasamos las variables CORRECTAS (alturaApi y sexoApi)
+                IntervalsUpdateProfileDTO updateDTO = new IntervalsUpdateProfileDTO(nuevoPeso, alturaApi, fechaNacimiento, sexoApi);
+
+                System.out.println("[PUSH] Subiendo nuevo perfil a Intervals...");
+
                 restClient.put()
                         .uri("/athlete/{id}", creds.athleteId())
                         .header("Authorization", "Basic " + encodedAuth)
-                        .body(updateDTO) // Spring convierte el DTO a JSON automáticamente
+                        .body(updateDTO)
                         .retrieve()
                         .toBodilessEntity();
-                System.out.println("Perfil actualizado");
 
+                System.out.println("[PUSH] Perfil actualizado correctamente en la red.");
             });
-
-
         } catch (Exception e) {
             System.err.println("[PUSH ERROR] No se pudo actualizar el perfil en Intervals: " + e.getMessage());
         }
