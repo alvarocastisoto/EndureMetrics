@@ -17,9 +17,12 @@ public class IntervalsController {
     private final IntervalsService intervalsService;
     // ¡FUERA EL REPOSITORIO DE AQUÍ!
 
-    @FXML private TextField athleteIdField;
-    @FXML private PasswordField apiKeyField;
-    @FXML private Label mensajeLabel;
+    @FXML
+    private TextField athleteIdField;
+    @FXML
+    private PasswordField apiKeyField;
+    @FXML
+    private Label mensajeLabel;
 
     public IntervalsController(UserSession userSession, IntervalsService intervalsService) {
         this.userSession = userSession;
@@ -52,9 +55,17 @@ public class IntervalsController {
             // 2. SEGUNDO hacemos el ping a la API (que leerá las credenciales recién guardadas)
             IntervalsAthleteDTO atleta = intervalsService.probarConexion(userSession.getUsuarioLogueado());
 
+
             System.out.println("¡Éxito! Atleta conectado: " + atleta.firstname());
             ViewUtils.mostrarMensaje(mensajeLabel, "¡Conectado como " + atleta.firstname() + "!", "#27ae60");
-
+            java.util.List<com.alvaro.enduremetrics.dto.intervals.IntervalsActivityDTO> historial =
+                    intervalsService.descargaHistorialActividades(userSession.getUsuarioLogueado());
+            if (!historial.isEmpty()) {
+                System.out.println("--- PRIMER ENTRENAMIENTO ENCONTRADO ---");
+                System.out.println("Deporte: " + historial.get(0).type());
+                System.out.println("Fecha: " + historial.get(0).fechaInicio());
+                System.out.println("Distancia: " + (historial.get(0).distance() / 1000.0) + " km");
+            }
         } catch (IllegalArgumentException e) {
             ViewUtils.mostrarMensaje(mensajeLabel, e.getMessage(), "#e74c3c");
         } catch (Exception e) {

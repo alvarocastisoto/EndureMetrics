@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List; // Añadido para que no rompa la compilación
 import java.util.UUID;
 
+import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.util.StringCryptoConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,9 +48,13 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Zapatilla> armarioZapatillas = new ArrayList<>();
 
-    // Método helper profesional para añadir material
+    // Método helper para añadir material
     public void addZapatilla(Zapatilla zapatilla) {
         armarioZapatillas.add(zapatilla);
         zapatilla.setUsuario(this);
     }
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Entrenamiento> entrenamientos = new ArrayList<>();
+
 }

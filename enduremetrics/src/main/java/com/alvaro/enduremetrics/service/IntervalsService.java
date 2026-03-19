@@ -1,5 +1,6 @@
 package com.alvaro.enduremetrics.service;
 
+import com.alvaro.enduremetrics.dto.intervals.IntervalsActivityDTO;
 import com.alvaro.enduremetrics.dto.intervals.IntervalsAthleteDTO;
 import com.alvaro.enduremetrics.dto.intervals.IntervalsDTO;
 import com.alvaro.enduremetrics.dto.intervals.IntervalsUpdateProfileDTO;
@@ -15,7 +16,9 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class IntervalsService {
@@ -167,6 +170,42 @@ public class IntervalsService {
         } catch (Exception e) {
             System.err.println("[PUSH ERROR] No se pudo actualizar el perfil en Intervals: " + e.getMessage());
         }
+    }
+
+
+    public List<IntervalsActivityDTO> descargaHistorialActividades(Usuario usuarioSession) {
+
+        Usuario usuarioGestionado = usuarioRepository.findByUsername(usuarioSession.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        IntervalsCredentials creds = credentialsRepository.findByUsuario(usuarioGestionado)
+                .orElseThrow(() -> new RuntimeException("El usuario no tiene credenciales"));
+
+        String authRaw = "API_KEY:" + creds.getIntervalsApiKey();
+        String encondeAuth = Base64.getEncoder().encodeToString(authRaw.getBytes());
+
+        try {
+            System.out.println("[PULL] Descargando historial de actividades de Intervals...");
+
+            IntervalsActivityDTO[] actividadesArray = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/athlete/{id}/activities")
+                            .queryParam("oldest", "2000-01-01T00:00:00")
+                            .build(creds.getIntervalsId()))
+                    .header("Authorization", "Basic " + encondeAuth)
+                    .retrieve()
+                    .body(IntervalsActivityDTO[].class);
+
+            if (actividadesArray == null || actividadesArray.length == 0) {
+                return List.of();
+            }
+            System.out.println("[PULL] Éxito. Descargadas " + actividadesArray.length + " actividades");
+            return Arrays.asList(actividadesArray);
+        } catch (Exception e) {
+            System.err.println("[PULL ERROR] Fallo al descargar actividades: " + e.getMessage());
+            throw new RuntimeException("No se pudieron descargar las actividades.");
+        }
+
     }
 
 }
