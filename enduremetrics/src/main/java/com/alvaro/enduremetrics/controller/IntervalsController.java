@@ -1,5 +1,6 @@
 package com.alvaro.enduremetrics.controller;
 
+import com.alvaro.enduremetrics.dto.intervals.IntervalsActivityDTO;
 import com.alvaro.enduremetrics.dto.intervals.IntervalsAthleteDTO;
 import com.alvaro.enduremetrics.service.IntervalsService;
 import com.alvaro.enduremetrics.session.UserSession;
@@ -9,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.springframework.stereotype.Controller;
+
+import java.util.List;
 
 @Controller
 public class IntervalsController {
@@ -58,13 +61,18 @@ public class IntervalsController {
 
             System.out.println("¡Éxito! Atleta conectado: " + atleta.firstname());
             ViewUtils.mostrarMensaje(mensajeLabel, "¡Conectado como " + atleta.firstname() + "!", "#27ae60");
-            java.util.List<com.alvaro.enduremetrics.dto.intervals.IntervalsActivityDTO> historial =
-                    intervalsService.descargaHistorialActividades(userSession.getUsuarioLogueado());
+            List<IntervalsActivityDTO> historial = intervalsService.descargaHistorialActividades(userSession.getUsuarioLogueado());
+            intervalsService.guardarHistorialEnBD(userSession.getUsuarioLogueado(), historial);
+            ViewUtils.mostrarMensaje(mensajeLabel, "Historial sincronizado: " + historial.size() + " actividades", "#27ae60");
             if (!historial.isEmpty()) {
+                IntervalsActivityDTO primera = historial.get(0);
                 System.out.println("--- PRIMER ENTRENAMIENTO ENCONTRADO ---");
-                System.out.println("Deporte: " + historial.get(0).type());
-                System.out.println("Fecha: " + historial.get(0).fechaInicio());
-                System.out.println("Distancia: " + (historial.get(0).distance() / 1000.0) + " km");
+                System.out.println("Deporte: " + primera.type());
+                System.out.println("Fecha: " + primera.fechaInicio());
+
+                // Verificación de seguridad para el print
+                double kms = (primera.distance() != null) ? (primera.distance() / 1000.0) : 0.0;
+                System.out.println("Distancia: " + kms + " km");
             }
         } catch (IllegalArgumentException e) {
             ViewUtils.mostrarMensaje(mensajeLabel, e.getMessage(), "#e74c3c");

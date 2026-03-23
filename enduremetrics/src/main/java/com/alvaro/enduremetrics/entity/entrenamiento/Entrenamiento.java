@@ -31,8 +31,10 @@ public class Entrenamiento {
     @Column(nullable = false)
     private LocalDateTime fechaInicio;
 
-    private double distancia;
+    @Column(name = "distancia", nullable = true) // <--- Forzamos que sea nullable
+    private Double distancia;
 
+    @Column(name = "tiempo_movimiento", nullable = true)
     private Integer tiempoMovimiento;
 
 

@@ -6,6 +6,10 @@ import com.alvaro.enduremetrics.dto.intervals.IntervalsDTO;
 import com.alvaro.enduremetrics.dto.intervals.IntervalsUpdateProfileDTO;
 import com.alvaro.enduremetrics.entity.IntervalsCredentials;
 import com.alvaro.enduremetrics.entity.Usuario;
+import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
+import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
+import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
+import com.alvaro.enduremetrics.repository.EntrenamientoRepository;
 import com.alvaro.enduremetrics.repository.IntervalsRepository;
 import com.alvaro.enduremetrics.repository.UsuarioRepository;
 import com.alvaro.enduremetrics.session.UserSession;
@@ -27,11 +31,13 @@ public class IntervalsService {
     private final UsuarioRepository usuarioRepository; // <-- Añadido de nuevo
     private final RestClient restClient;
     private final UserSession userSession;
+    private final EntrenamientoRepository entrenamientoRepository;
 
-    public IntervalsService(IntervalsRepository credentialsRepository, UsuarioRepository usuarioRepository, UserSession userSession) {
+    public IntervalsService(IntervalsRepository credentialsRepository, UsuarioRepository usuarioRepository, UserSession userSession, EntrenamientoRepository entrenamientoRepository) {
         this.credentialsRepository = credentialsRepository;
         this.usuarioRepository = usuarioRepository;
         this.userSession = userSession;
+        this.entrenamientoRepository = entrenamientoRepository;
         this.restClient = RestClient.builder()
                 .baseUrl("https://intervals.icu/api/v1")
                 .build();
@@ -206,6 +212,37 @@ public class IntervalsService {
             throw new RuntimeException("No se pudieron descargar las actividades.");
         }
 
+    }
+
+    public void guardarHistorialEnBD(Usuario usuarioSession, List<IntervalsActivityDTO> historial) {
+
+        Usuario usuarioGestionado = usuarioRepository.findByUsername(usuarioSession.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrad"));
+
+        int duplicados = 0;
+        int nuevos = 0;
+        for (IntervalsActivityDTO dto : historial) {
+            if (entrenamientoRepository.existsByIntervalsId(dto.id())) {
+                duplicados++;
+                continue;
+            }
+
+            Entrenamiento entidad = switch (dto.type()) {
+                case "Ride", "VirtualRide" -> new EntrenamientoCiclismo();
+                case "Run" -> new EntrenamientoCarrera();
+                default -> new Entrenamiento(); // Genérico para el resto (Swim, Yoga, etc.)
+            };
+
+            entidad.setUsuario(usuarioGestionado);
+            entidad.setIntervalsId(dto.id());
+            entidad.setFechaInicio(dto.fechaInicio());
+            entidad.setDistancia(dto.distance());
+            entidad.setTiempoMovimiento(dto.tiempoMovimiento());
+
+            entrenamientoRepository.save(entidad);
+            nuevos++;
+        }
+        System.out.println("[DB] Sincronización finalizada. Nuevos: " + nuevos + " | Saltados: " + duplicados);
     }
 
 }

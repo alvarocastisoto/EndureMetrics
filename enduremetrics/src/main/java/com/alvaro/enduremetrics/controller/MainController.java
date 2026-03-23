@@ -117,6 +117,11 @@ public class MainController {
         cargarVista("/views/profile-view.fxml");
     }
 
+    public void mostrarEntrenamiento() {
+        cargarVista("/views/entrenamientos-view.fxml");
+    }
+
+
     private void cargarVista(String rutaFxml) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(rutaFxml));

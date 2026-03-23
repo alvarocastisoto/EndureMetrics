@@ -80,6 +80,15 @@
                      </font>
                   </Button>
 
+                  <Button onAction="#mostrarEntrenamiento" maxWidth="1.7976931348623157E308"
+                          alignment="BASELINE_LEFT"
+                          style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
+                          text="👤  Entrenamientos">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Button>
+
                   <VBox VBox.vgrow="ALWAYS" />
 
                   <Button onAction="#cerrarSesion" maxWidth="1.7976931348623157E308"
