@@ -1,6 +1,5 @@
 package com.alvaro.enduremetrics.controller;
 
-
 import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
@@ -9,14 +8,9 @@ import com.alvaro.enduremetrics.session.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.layout.*;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -37,15 +31,19 @@ public class CalendarioController {
     private Label labelMesAnio;
 
     private YearMonth mesActual = YearMonth.now();
+    private final ApplicationContext springContext;
 
-    public CalendarioController(EntrenamientoService entrenamientoService, UserSession userSession) {
+    public CalendarioController(EntrenamientoService entrenamientoService, UserSession userSession,
+            ApplicationContext springContext) {
         this.entrenamientoService = entrenamientoService;
         this.userSession = userSession;
+        this.springContext = springContext;
     }
 
     @FXML
     public void initialize() {
-        if (mesActual == null) mesActual = YearMonth.now();
+        if (mesActual == null)
+            mesActual = YearMonth.now();
         dibujarCalendario();
     }
 
@@ -55,14 +53,15 @@ public class CalendarioController {
             return;
         }
 
-        gridCalendario.getChildren().removeIf(nodo -> GridPane.getRowIndex(nodo) != null && GridPane.getRowIndex(nodo) > 0);
+        gridCalendario.getChildren()
+                .removeIf(nodo -> GridPane.getRowIndex(nodo) != null && GridPane.getRowIndex(nodo) > 0);
         labelMesAnio.setText(mesActual.getMonth().name() + " " + mesActual.getYear());
 
-        List<Entrenamiento> entrenos = entrenamientoService.obtenerHistorialDelMes(userSession.getUsuarioLogueado(), mesActual);
+        List<Entrenamiento> entrenos = entrenamientoService.obtenerHistorialDelMes(userSession.getUsuarioLogueado(),
+                mesActual);
 
         Map<LocalDate, List<Entrenamiento>> mapaEntrenos = entrenos.stream()
                 .collect(Collectors.groupingBy(e -> e.getFechaInicio().toLocalDate()));
-
 
         // Lógica de posicionamiento
         LocalDate primerDiaMes = mesActual.atDay(1);
@@ -111,7 +110,8 @@ public class CalendarioController {
             for (Entrenamiento e : entrenosDia) {
                 Label lbEntreno = new Label();
                 lbEntreno.setMaxWidth(Double.MAX_VALUE);
-                lbEntreno.setStyle("-fx-font-size: 10; -fx-padding: 2 5 2 5; -fx-background-radius: 3; -fx-text-fill: white;");
+                lbEntreno.setStyle(
+                        "-fx-font-size: 10; -fx-padding: 2 5 2 5; -fx-background-radius: 3; -fx-text-fill: white;");
 
                 // Lógica de visualización por tipo
                 if (e instanceof EntrenamientoCiclismo) {
@@ -154,33 +154,36 @@ public class CalendarioController {
     }
 
     private String formatKm(Entrenamiento e) {
-        if (e.getDistancia() == null) return "";
+        if (e.getDistancia() == null)
+            return "";
         return String.format("%.1fk", e.getDistancia() / 1000);
     }
 
     private void abrirDetalleEntrenamiento(Entrenamiento entreno, javafx.scene.input.MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detalle-entrenamiento-view.fxml"));
-            // NOTA: Si usas Spring para inyectar servicios en el DetalleController,
-            // aquí tendrías que pasarle el applicationContext al loader. Si no, esto tira perfecto.
-            javafx.scene.Parent vistaDetalle = loader.load();
 
-            DetalleEntrenamientoController controladorDetalle = loader.getController();
-            controladorDetalle.cargarDatos(entreno);
+            // 1. Spring crea el controlador (Inyección de dependencias lista)
+            loader.setControllerFactory(springContext::getBean);
+            Parent vista = loader.load();
 
-            // EL TRUCO DE ENRUTAMIENTO:
-            // 1. Buscamos el nodo que recibió el clic (el label)
-            javafx.scene.Node nodoOrigen = (javafx.scene.Node) event.getSource();
+            // 2. EL PASO QUE FALTABA: Recuperamos el controlador y le inyectamos los datos
+            // en RAM
+            DetalleEntrenamientoController controlador = loader.getController();
+            controlador.cargarDatos(entreno);
 
-            // 2. Buscamos la escena principal donde vive ese nodo
-            javafx.scene.Scene escenaPrincipal = nodoOrigen.getScene();
-
-            // 3. ¡ZAS! Sustituimos todo el contenido de la ventana por la nueva vista
-            escenaPrincipal.setRoot(vistaDetalle);
-
-        } catch (java.io.IOException ex) {
-            System.err.println("Error al navegar a la vista de detalles.");
-            ex.printStackTrace();
+            // 3. Enrutamiento limpio en el panel central
+            StackPane panelCentralReal = (StackPane) gridCalendario.getScene().lookup("#panelCentral");
+            if (panelCentralReal != null) {
+                panelCentralReal.getChildren().setAll(vista);
+            } else {
+                // Plan B por si el ID en tu main no es exactamente "panelCentral"
+                System.err
+                        .println("Ojo: No se ha encontrado el #panelCentral. Verifica el fx:id en tu vista principal.");
+            }
+        } catch (IOException e) {
+            System.err.println("Error al inyectar la vista de detalle en el panel central.");
+            e.printStackTrace();
         }
     }
 }

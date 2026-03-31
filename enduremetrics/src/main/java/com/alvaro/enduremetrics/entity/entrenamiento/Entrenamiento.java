@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Entrenamiento {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,6 +37,13 @@ public class Entrenamiento {
     @Column(name = "tiempo_movimiento", nullable = true)
     private Integer tiempoMovimiento;
 
+    @Column(name = "carga_tss")
+    private Integer cargaTss; // Training Stress Score
 
+    @Column(name = "frecuencia_cardiaca_media")
+    private Integer frecuenciaCardiacaMedia;
+
+    @Column(name = "calorias")
+    private Integer calorias;
 
 }
