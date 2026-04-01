@@ -9,6 +9,7 @@ import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
+import com.alvaro.enduremetrics.mapper.EntrenamientoMapper;
 import com.alvaro.enduremetrics.repository.EntrenamientoRepository;
 import com.alvaro.enduremetrics.repository.IntervalsRepository;
 import com.alvaro.enduremetrics.repository.UsuarioRepository;
@@ -32,12 +33,14 @@ public class IntervalsService {
     private final RestClient restClient;
     private final UserSession userSession;
     private final EntrenamientoRepository entrenamientoRepository;
+    private final EntrenamientoMapper mapper;
 
-    public IntervalsService(IntervalsRepository credentialsRepository, UsuarioRepository usuarioRepository, UserSession userSession, EntrenamientoRepository entrenamientoRepository) {
+    public IntervalsService(IntervalsRepository credentialsRepository, UsuarioRepository usuarioRepository, UserSession userSession, EntrenamientoRepository entrenamientoRepository, EntrenamientoMapper mapper) {
         this.credentialsRepository = credentialsRepository;
         this.usuarioRepository = usuarioRepository;
         this.userSession = userSession;
         this.entrenamientoRepository = entrenamientoRepository;
+        this.mapper = mapper;
         this.restClient = RestClient.builder()
                 .baseUrl("https://intervals.icu/api/v1")
                 .build();
@@ -217,7 +220,7 @@ public class IntervalsService {
     public void guardarHistorialEnBD(Usuario usuarioSession, List<IntervalsActivityDTO> historial) {
 
         Usuario usuarioGestionado = usuarioRepository.findByUsername(usuarioSession.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrad"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         int duplicados = 0;
         int nuevos = 0;
@@ -226,18 +229,9 @@ public class IntervalsService {
                 duplicados++;
                 continue;
             }
-
-            Entrenamiento entidad = switch (dto.type()) {
-                case "Ride", "VirtualRide" -> new EntrenamientoCiclismo();
-                case "Run" -> new EntrenamientoCarrera();
-                default -> new Entrenamiento(); // Genérico para el resto (Swim, Yoga, etc.)
-            };
+            Entrenamiento entidad = mapper.toEntity(dto);
 
             entidad.setUsuario(usuarioGestionado);
-            entidad.setIntervalsId(dto.id());
-            entidad.setFechaInicio(dto.fechaInicio());
-            entidad.setDistancia(dto.distance());
-            entidad.setTiempoMovimiento(dto.tiempoMovimiento());
 
             entrenamientoRepository.save(entidad);
             nuevos++;

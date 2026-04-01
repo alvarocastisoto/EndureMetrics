@@ -71,7 +71,7 @@ public class IntervalsController {
                 System.out.println("Fecha: " + primera.fechaInicio());
 
                 // Verificación de seguridad para el print
-                double kms = (primera.distance() != null) ? (primera.distance() / 1000.0) : 0.0;
+                double kms = (primera.distancia() != null) ? (primera.distancia() / 1000.0) : 0.0;
                 System.out.println("Distancia: " + kms + " km");
             }
         } catch (IllegalArgumentException e) {

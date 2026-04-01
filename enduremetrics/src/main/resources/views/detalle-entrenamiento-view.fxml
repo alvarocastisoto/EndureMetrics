@@ -86,7 +86,7 @@
 
             <VBox maxWidth="900.0" spacing="15.0"
                   style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-padding: 25;">
-                <Label text="Métricas Avanzadas (Próximamente)" textFill="#2c3e50">
+                <Label text="Métricas Fisiológicas" textFill="#2c3e50">
                     <font>
                         <Font name="System Bold" size="16.0"/>
                     </font>
@@ -104,37 +104,21 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                     </rowConstraints>
 
-                    <Label style="-fx-font-weight: bold;" text="Potencia Media:" textFill="#7f8c8d"
+                    <Label style="-fx-font-weight: bold;" text="Rendimiento (W/Kg):" textFill="#7f8c8d"
                            GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Label text="--- W" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label fx:id="lblPotencia" text="---" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
                     <Label style="-fx-font-weight: bold;" text="Frec. Cardíaca:" textFill="#7f8c8d"
                            GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <Label text="--- ppm" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label fx:id="lblFrecCardiaca" text="---" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                    <Label style="-fx-font-weight: bold;" text="Carga (TSS):" textFill="#7f8c8d"
-                           GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <Label text="---" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-                    <Label style="-fx-font-weight: bold;" text="Desnivel:" textFill="#7f8c8d" GridPane.columnIndex="2"
-                           GridPane.rowIndex="1"/>
-                    <Label text="--- m" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-
-                    <Label style="-fx-font-weight: bold;" text="Potencia Media:" textFill="#7f8c8d"
-                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Label fx:id="lblPotencia" text="--- W" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                    <Label style="-fx-font-weight: bold;" text="Frec. Cardíaca:" textFill="#7f8c8d"
-                           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <Label fx:id="lblFrecCardiaca" text="--- ppm" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                    <Label style="-fx-font-weight: bold;" text="Carga (TSS):" textFill="#7f8c8d"
+                    <Label style="-fx-font-weight: bold;" text="Estrés (TSS):" textFill="#7f8c8d"
                            GridPane.columnIndex="2" GridPane.rowIndex="0"/>
                     <Label fx:id="lblTss" text="---" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
                     <Label style="-fx-font-weight: bold;" text="Desnivel:" textFill="#7f8c8d" GridPane.columnIndex="2"
                            GridPane.rowIndex="1"/>
-                    <Label fx:id="lblDesnivel" text="--- m" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                    <Label fx:id="lblDesnivel" text="---" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
                 </GridPane>
             </VBox>
 

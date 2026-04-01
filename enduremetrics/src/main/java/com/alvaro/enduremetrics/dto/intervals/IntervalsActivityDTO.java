@@ -2,79 +2,36 @@ package com.alvaro.enduremetrics.dto.intervals;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true) // <-- BLINDAJE SENIOR
-public class IntervalsActivityDTO {
+public record IntervalsActivityDTO(
 
-    // --- CAMPOS COMUNES / IDENTIFICACIÓN ---
+        // --- CAMPOS COMUNES / IDENTIFICACIÓN ---
+        @JsonProperty("id") String id,
+        @JsonProperty("type") String type,
+        @JsonProperty("start_date_local") LocalDateTime fechaInicio,
 
-    @JsonProperty("id")
-    private String id; // El ID único de Intervals
+        // --- MÉTRICAS FISIOLÓGICAS (Clase Padre) ---
+        @JsonProperty("distance") Double distancia,
+        @JsonProperty("moving_time") Integer tiempoMovimiento,
+        @JsonProperty("icu_training_load") Integer cargaTss,
+        @JsonProperty("average_heartrate") Integer frecuenciaCardiacaMedia,
+        @JsonProperty("calories") Integer calorias,
 
-    @JsonProperty("type")
-    private String type; // Ej: "Run", "Ride", "WeightTraining"
+        // --- MÉTRICAS DE CARRERA / BIOMECÁNICA ---
+        @JsonProperty("total_elevation_gain") Integer desnivelPositivo,
+        @JsonProperty("average_speed") Double ritmoMedio,
+        @JsonProperty("gap") Double gapRitmoAjustado,
+        @JsonProperty("average_watts") Integer potenciaMedia,
+        @JsonProperty("average_cadence") Integer cadenciaMedia,
 
-    @JsonProperty("start_date_local")
-    private LocalDateTime fechaInicio; // Fecha y hora local del entreno
+        // Dinámica avanzada
+        @JsonProperty("stride_length") Double longitudZancada,
+        @JsonProperty("ground_contact_time") Integer tiempoContactoSuelo,
+        @JsonProperty("vertical_oscillation") Double oscilacionVertical,
+        @JsonProperty("vertical_ratio") Double ratioVertical,
 
-    // --- MÉTRICAS FISIOLÓGICAS (Clase Padre) ---
-
-    @JsonProperty("distance")
-    private Double distancia; // En metros
-
-    @JsonProperty("moving_time")
-    private Integer tiempoMovimiento; // En segundos
-
-    @JsonProperty("icu_training_load")
-    private Integer cargaTss; // TSS calculado por Intervals
-
-    @JsonProperty("average_heartrate")
-    private Integer frecuenciaCardiacaMedia;
-
-    @JsonProperty("calories")
-    private Integer calorias;
-
-    // --- MÉTRICAS DE CARRERA / BIOMECÁNICA ---
-
-    @JsonProperty("total_elevation_gain")
-    private Integer desnivelPositivo;
-
-    @JsonProperty("average_speed")
-    private Double ritmoMedio; // Intervals lo manda en m/s
-
-    @JsonProperty("gap")
-    private Double gapRitmoAjustado; // Grade Adjusted Pace
-
-    @JsonProperty("average_watts")
-    private Integer potenciaMedia; // Sirve tanto para bici como para carrera (Stryd)
-
-    @JsonProperty("average_cadence")
-    private Integer cadenciaMedia;
-
-    // OJO: Los campos de dinámica avanzada a veces cambian o vienen nulos si el usuario no tiene banda HRM-Pro o Stryd
-    @JsonProperty("stride_length")
-    private Double longitudZancada;
-
-    @JsonProperty("ground_contact_time")
-    private Integer tiempoContactoSuelo;
-
-    @JsonProperty("vertical_oscillation")
-    private Double oscilacionVertical;
-
-    @JsonProperty("vertical_ratio")
-    private Double ratioVertical;
-
-    // --- MÉTRICAS DE GIMNASIO ---
-
-    @JsonProperty("work") // Intervals suele usar 'work' para el volumen/carga en Kj, podemos mapearlo al volumen
-    private Integer volumenTotalKg;
-
-}
+        // --- MÉTRICAS DE GIMNASIO ---
+        @JsonProperty("work") Integer volumenTotalKg
+) {}

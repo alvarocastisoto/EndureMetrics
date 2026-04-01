@@ -15,27 +15,27 @@ public class EntrenamientoMapper {
 
         Entrenamiento entreno;
 
-        String tipoSeguro = dto.getType() != null ? dto.getType().toLowerCase() : "desconocido";
+        String tipoSeguro = dto.type() != null ? dto.type().toLowerCase() : "desconocido";
 
         switch (tipoSeguro) {
             case "run":
                 EntrenamientoCarrera carrera = new EntrenamientoCarrera();
-                carrera.setDesnivelPositivo(dto.getDesnivelPositivo());
-                carrera.setRitmoMedio(dto.getRitmoMedio());
-                carrera.setGapRitmoAjustado(dto.getGapRitmoAjustado());
-                carrera.setPotenciaCarreraMedia(dto.getPotenciaMedia());
-                carrera.setCadenciaMedia(dto.getCadenciaMedia());
-                carrera.setLongitudZancada(dto.getLongitudZancada());
-                carrera.setTiempoContactoSuelo(dto.getTiempoContactoSuelo());
-                carrera.setOscilacionVertical(dto.getOscilacionVertical());
-                carrera.setRatioVertical(dto.getRatioVertical());
+                carrera.setDesnivelPositivo(dto.desnivelPositivo());
+                carrera.setRitmoMedio(dto.ritmoMedio());
+                carrera.setGapRitmoAjustado(dto.gapRitmoAjustado());
+                carrera.setPotenciaCarreraMedia(dto.potenciaMedia());
+                carrera.setCadenciaMedia(dto.cadenciaMedia());
+                carrera.setLongitudZancada(dto.longitudZancada());
+                carrera.setTiempoContactoSuelo(dto.tiempoContactoSuelo());
+                carrera.setOscilacionVertical(dto.oscilacionVertical());
+                carrera.setRatioVertical(dto.ratioVertical());
 
                 entreno = carrera;
                 break;
             case "weighttraining":
             case "workout":
                 EntrenamientoGimnasio gym = new EntrenamientoGimnasio();
-                gym.setVolumenTotalKg(dto.getVolumenTotalKg());
+                gym.setVolumenTotalKg(dto.volumenTotalKg());
 
                 entreno = gym;
                 break;
@@ -44,13 +44,13 @@ public class EntrenamientoMapper {
                 // Fallback: Si manda "yoga", "swim" o "desconocido", no perdemos el TSS
                 entreno = new Entrenamiento();
         }
-        entreno.setIntervalsId(dto.getId());
-        entreno.setFechaInicio(dto.getFechaInicio());
-        entreno.setDistancia(dto.getDistancia());
-        entreno.setTiempoMovimiento(dto.getTiempoMovimiento());
-        entreno.setCargaTss(dto.getCargaTss());
-        entreno.setFrecuenciaCardiacaMedia(dto.getFrecuenciaCardiacaMedia());
-        entreno.setCalorias(dto.getCalorias());
+        entreno.setIntervalsId(dto.id());
+        entreno.setFechaInicio(dto.fechaInicio());
+        entreno.setDistancia(dto.distancia());
+        entreno.setTiempoMovimiento(dto.tiempoMovimiento());
+        entreno.setCargaTss(dto.cargaTss());
+        entreno.setFrecuenciaCardiacaMedia(dto.frecuenciaCardiacaMedia());
+        entreno.setCalorias(dto.calorias());
 
 
         return entreno;

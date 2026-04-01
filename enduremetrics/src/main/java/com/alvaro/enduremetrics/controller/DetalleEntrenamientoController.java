@@ -1,83 +1,90 @@
 package com.alvaro.enduremetrics.controller;
 
 import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
-import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
+import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
+import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoGimnasio;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
+
+import java.io.IOException;
+import java.time.Duration;
 
 @Controller
 public class DetalleEntrenamientoController {
 
-    @FXML
-    private Label lblDeporte;
-    @FXML
-    private Label lblFecha;
-    @FXML
-    private Label lblDistancia;
-    // Añade los @FXML que quieras (tiempo, ID de Intervals, etc.)
+    @FXML private Label lblDeporte;
+    @FXML private Label lblFecha;
+    @FXML private Label lblDistancia;
+    @FXML private Label lblDuracion;
+    @FXML private Label lblTss;
+    @FXML private Label lblFrecCardiaca;
+    @FXML private Label lblDesnivel;
+    @FXML private Label lblPotencia;
 
-    // Este método es llamado desde el CalendarioController ANTES de mostrar la ventana
+    private final ApplicationContext springContext;
+
+    // Inyectamos el contexto de Spring para cuando tengamos que volver al Calendario
+    public DetalleEntrenamientoController(ApplicationContext springContext) {
+        this.springContext = springContext;
+    }
+
     public void cargarDatos(Entrenamiento entreno) {
-        // Aquí extraemos todo el jugo al objeto que ya teníamos en memoria RAM
-        lblDeporte.setText(entreno.getClass().getSimpleName()); // Nos dirá si es Ciclismo o Carrera
-        lblFecha.setText(entreno.getFechaInicio().toString());
+        // 1. Datos Universales (Clase Padre)
+        lblDeporte.setText(entreno.getClass().getSimpleName().replace("Entrenamiento", ""));
+
+        // Formateo de fecha limpio
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy - HH:mm");
+        lblFecha.setText(entreno.getFechaInicio().format(formatter));
 
         if (entreno.getDistancia() != null) {
             lblDistancia.setText(String.format("%.2f km", entreno.getDistancia() / 1000.0));
         } else {
-            lblDistancia.setText("Sin distancia");
+            lblDistancia.setText("-");
         }
 
-        // 1. Carga de Entrenamiento (TSS)
-        if (entreno.getCargaTss() != null) { // Ajusta el getCargaTss() al nombre real de tu entidad
-            lblTss.setText(String.valueOf(entreno.getCargaTss()));
+        if (entreno.getTiempoMovimiento() != null) {
+            Duration d = Duration.ofSeconds(entreno.getTiempoMovimiento());
+            lblDuracion.setText(String.format("%d:%02d:%02d", d.toHoursPart(), d.toMinutesPart(), d.toSecondsPart()));
         } else {
-            lblTss.setText("N/A");
+            lblDuracion.setText("-");
         }
 
-        // 2. Frecuencia Cardíaca Media
-        if (entreno.getFrecuenciaCardiacaMedia() != null) {
-            lblFrecCardiaca.setText(entreno.getFrecuenciaCardiacaMedia() + " ppm");
-        } else {
-            lblFrecCardiaca.setText("N/A");
-        }
+        lblTss.setText(entreno.getCargaTss() != null ? String.valueOf(entreno.getCargaTss()) : "N/A");
+        lblFrecCardiaca.setText(entreno.getFrecuenciaCardiacaMedia() != null ? entreno.getFrecuenciaCardiacaMedia() + " ppm" : "N/A");
 
-        // 3. Desnivel Acumulado
-        if (entreno.getDesnivelPositivo() != null) {
-            lblDesnivel.setText(entreno.getDesnivelPositivo() + " m");
+        // 2. Datos Específicos por Biomecánica (Polimorfismo limpio)
+        if (entreno instanceof EntrenamientoCarrera carrera) {
+            lblDesnivel.setText(carrera.getDesnivelPositivo() != null ? carrera.getDesnivelPositivo() + " m" : "0 m");
+            lblPotencia.setText(carrera.getPotenciaCarreraMedia() != null ? carrera.getPotenciaCarreraMedia() + " W" : "N/A");
+        } else if (entreno instanceof EntrenamientoGimnasio gym) {
+            lblDesnivel.setText("-");
+            lblPotencia.setText(gym.getVolumenTotalKg() != null ? gym.getVolumenTotalKg() + " kg (Vol)" : "N/A");
         } else {
-            lblDesnivel.setText("0 m");
-        }
-
-        // 4. Potencia (Aquí usamos el polimorfismo que mencionamos antes)
-        if (entreno instanceof EntrenamientoCiclismo) {
-            EntrenamientoCiclismo bici = (EntrenamientoCiclismo) entreno;
-            if (bici.getPotenciaNormalizada() != null) {
-                // Destacamos la normalizada que es la que importa
-                lblPotencia.setText(bici.getPotenciaNormalizada() + " W (NP)");
-            } else if (bici.getPotenciaMedia() != null) {
-                lblPotencia.setText(bici.getPotenciaMedia() + " W (Med)");
-            } else {
-                lblPotencia.setText("N/A");
-            }
-        } else {
-            // Si es correr o gimnasio y no hay potenciómetro
+            lblDesnivel.setText("-");
             lblPotencia.setText("-");
         }
     }
 
     @FXML
-    public void volverAlCalendario(javafx.event.ActionEvent event) {
+    public void volverAlCalendario(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/calendario-view.fxml"));
-            javafx.scene.Parent vistaCalendario = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/entrenamientos-view.fxml"));
+            // IMPORTANTÍSIMO: Devolvemos el control a Spring al cargar el calendario
+            loader.setControllerFactory(springContext::getBean);
+            Parent vistaCalendario = loader.load();
 
-            javafx.scene.Scene escenaPrincipal = ((javafx.scene.Node) event.getSource()).getScene();
-            escenaPrincipal.setRoot(vistaCalendario);
-        } catch (java.io.IOException e) {
+            // Navegación limpia SPA sin destruir el menú lateral
+            StackPane panelCentralReal = (StackPane) ((javafx.scene.Node) event.getSource()).getScene().lookup("#panelCentral");
+            if (panelCentralReal != null) {
+                panelCentralReal.getChildren().setAll(vistaCalendario);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
