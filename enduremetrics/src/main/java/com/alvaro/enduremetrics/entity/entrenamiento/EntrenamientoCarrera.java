@@ -1,11 +1,12 @@
 package com.alvaro.enduremetrics.entity.entrenamiento;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("Run")
@@ -41,4 +42,7 @@ public class EntrenamientoCarrera extends Entrenamiento {
 
     @Column(name = "ratio_vertical")
     private Double ratioVertical; // % (Oscilación / Longitud de zancada). Mide la eficiencia
+
+    @OneToMany(mappedBy = "entrenamiento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VueltaCarrera> vueltas = new ArrayList<>();
 }

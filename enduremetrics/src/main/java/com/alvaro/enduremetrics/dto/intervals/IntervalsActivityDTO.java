@@ -3,6 +3,7 @@ package com.alvaro.enduremetrics.dto.intervals;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true) // <-- BLINDAJE SENIOR
 public record IntervalsActivityDTO(
@@ -12,7 +13,7 @@ public record IntervalsActivityDTO(
         @JsonProperty("type") String type,
         @JsonProperty("start_date_local") LocalDateTime fechaInicio,
 
-        // --- MÉTRICAS FISIOLÓGICAS (Clase Padre) ---
+        // --- MÉTRICAS FISIOLÓGICAS GLOBALES ---
         @JsonProperty("distance") Double distancia,
         @JsonProperty("moving_time") Integer tiempoMovimiento,
         @JsonProperty("icu_training_load") Integer cargaTss,
@@ -33,5 +34,10 @@ public record IntervalsActivityDTO(
         @JsonProperty("vertical_ratio") Double ratioVertical,
 
         // --- MÉTRICAS DE GIMNASIO ---
-        @JsonProperty("work") Integer volumenTotalKg
+        @JsonProperty("work") Integer volumenTotalKg,
+
+
+        @JsonProperty("decoupling") Double desacopleAerobico, // Métrica clave de resistencia
+
+        @JsonProperty("icu_intervals") List<IntervalsLapsDTO> vueltas // ARRAY DE VUELTAS
 ) {}
