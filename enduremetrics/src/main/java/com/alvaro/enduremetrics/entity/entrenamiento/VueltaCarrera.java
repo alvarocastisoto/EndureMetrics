@@ -51,6 +51,9 @@ public class VueltaCarrera {
     private Double gapMedio; // Grade Adjusted Pace (Ritmo ajustado a la pendiente)
 
     // --- FISIOLOGÍA CARDIACA Y METABÓLICA ---
+    @Column(name = "frecuencia_cardiaca_minima")
+    private Integer frecuenciaCardiacaMinima;
+
     @Column(name = "frecuencia_cardiaca_media")
     private Integer frecuenciaCardiacaMedia;
 
@@ -64,8 +67,6 @@ public class VueltaCarrera {
     @Column(name = "ascenso_total")
     private Integer ascensoTotal; // Desnivel positivo en esa vuelta
 
-    @Column(name = "descenso_total")
-    private Integer descensoTotal; // Desnivel negativo en esa vuelta
 
     // --- BIOMECÁNICA AVANZADA (RUNNING DYNAMICS) ---
     @Column(name = "cadencia_media")

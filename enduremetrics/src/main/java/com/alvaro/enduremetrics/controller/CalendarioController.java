@@ -4,6 +4,7 @@ import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
 import com.alvaro.enduremetrics.service.EntrenamientoService;
+import com.alvaro.enduremetrics.service.IntervalsService;
 import com.alvaro.enduremetrics.session.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class CalendarioController {
     private final EntrenamientoService entrenamientoService;
     private final UserSession userSession;
-
+    private final IntervalsService intervalsService;
     @FXML
     private GridPane gridCalendario;
     @FXML
@@ -33,10 +34,11 @@ public class CalendarioController {
     private YearMonth mesActual = YearMonth.now();
     private final ApplicationContext springContext;
 
-    public CalendarioController(EntrenamientoService entrenamientoService, UserSession userSession,
-            ApplicationContext springContext) {
+    public CalendarioController(EntrenamientoService entrenamientoService, UserSession userSession, IntervalsService intervalsService,
+                                ApplicationContext springContext) {
         this.entrenamientoService = entrenamientoService;
         this.userSession = userSession;
+        this.intervalsService = intervalsService;
         this.springContext = springContext;
     }
 
@@ -159,8 +161,10 @@ public class CalendarioController {
         return String.format("%.1fk", e.getDistancia() / 1000);
     }
 
-    private void abrirDetalleEntrenamiento(Entrenamiento entreno, javafx.scene.input.MouseEvent event) {
+    private void abrirDetalleEntrenamiento(Entrenamiento entrenoIncompleto, javafx.scene.input.MouseEvent event) {
         try {
+
+            Entrenamiento entrenoCompleto = intervalsService.obtenerEntrenamientoConDetalles(userSession.getUsuarioLogueado(), entrenoIncompleto.getId());
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detalle-entrenamiento-view.fxml"));
 
             // 1. Spring crea el controlador (Inyección de dependencias lista)
@@ -170,7 +174,7 @@ public class CalendarioController {
             // 2. EL PASO QUE FALTABA: Recuperamos el controlador y le inyectamos los datos
             // en RAM
             DetalleEntrenamientoController controlador = loader.getController();
-            controlador.cargarDatos(entreno);
+            controlador.cargarDatos(entrenoCompleto);
 
             // 3. Enrutamiento limpio en el panel central
             StackPane panelCentralReal = (StackPane) gridCalendario.getScene().lookup("#panelCentral");

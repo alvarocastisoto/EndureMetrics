@@ -9,11 +9,13 @@ import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
+import com.alvaro.enduremetrics.entity.entrenamiento.VueltaCarrera;
 import com.alvaro.enduremetrics.mapper.EntrenamientoMapper;
 import com.alvaro.enduremetrics.repository.EntrenamientoRepository;
 import com.alvaro.enduremetrics.repository.IntervalsRepository;
 import com.alvaro.enduremetrics.repository.UsuarioRepository;
 import com.alvaro.enduremetrics.session.UserSession;
+import org.hibernate.Hibernate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -237,6 +239,63 @@ public class IntervalsService {
             nuevos++;
         }
         System.out.println("[DB] Sincronización finalizada. Nuevos: " + nuevos + " | Saltados: " + duplicados);
+    }
+
+    public IntervalsActivityDTO descargarDetalleActividad(Usuario usuarioSession, String activityId) {
+        Usuario usuarioGestionado = usuarioRepository.findByUsername(usuarioSession.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        IntervalsCredentials creds = credentialsRepository.findByUsuario(usuarioGestionado)
+                .orElseThrow(() -> new RuntimeException("Sin credenciales"));
+
+        String authRaw = "API_KEY:" + creds.getIntervalsApiKey();
+        String encondeAuth = Base64.getEncoder().encodeToString(authRaw.getBytes());
+
+        // EL SECRETO REVELADO: El parámetro ?intervals=true es OBLIGATORIO para que el servidor no oculte el array
+        return restClient.get()
+                .uri("/activity/{id}?intervals=true", activityId)
+                .header("Authorization", "Basic " + encondeAuth)
+                .retrieve()
+                .body(IntervalsActivityDTO.class);
+    }
+
+    @Transactional
+    public Entrenamiento obtenerEntrenamientoConDetalles(Usuario usuarioSession, Long idEntrenamiento) {
+        Entrenamiento entreno = entrenamientoRepository.findById(idEntrenamiento)
+                .orElseThrow(() -> new RuntimeException("Entrenamiento no encontrado"));
+
+        if (entreno instanceof EntrenamientoCarrera carrera) {
+
+            // Protección vital: Si Hibernate devuelve la lista en null, la inicializamos
+            if (carrera.getVueltas() == null) {
+                carrera.setVueltas(new java.util.ArrayList<>());
+            } else {
+                Hibernate.initialize(carrera.getVueltas());
+            }
+
+            // LA MAGIA ARQUITECTÓNICA
+            if (carrera.getVueltas().isEmpty() && carrera.getIntervalsId() != null) {
+                System.out.println("[API] Vueltas vacías en BD. Solicitando detalle a Intervals...");
+
+                IntervalsActivityDTO detalleCompleto = descargarDetalleActividad(usuarioSession, carrera.getIntervalsId());
+
+                if (detalleCompleto != null && detalleCompleto.vueltas() != null) {
+                    List<VueltaCarrera> nuevasVueltas = mapper.mapearVueltas(detalleCompleto.vueltas(), carrera);
+
+                    if (!nuevasVueltas.isEmpty()) {
+                        carrera.getVueltas().addAll(nuevasVueltas);
+                        entrenamientoRepository.save(carrera);
+                        System.out.println("[DB] ¡ÉXITO! " + nuevasVueltas.size() + " vueltas guardadas.");
+                    } else {
+                        System.out.println("[DB] El mapper devolvió 0 vueltas. Revisa la estructura del DTO.");
+                    }
+                } else {
+                    System.out.println("[DB ERROR] La API no devolvió la lista de vueltas en el DTO (es null).");
+                }
+            } else {
+                System.out.println("[CACHE] Las vueltas ya estaban en base de datos. Cargando...");
+            }
+        }
+        return entreno;
     }
 
 }

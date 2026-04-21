@@ -1,11 +1,13 @@
 package com.alvaro.enduremetrics.dto.intervals;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true) // <-- BLINDAJE SENIOR
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record IntervalsActivityDTO(
 
         // --- CAMPOS COMUNES / IDENTIFICACIÓN ---
@@ -36,8 +38,12 @@ public record IntervalsActivityDTO(
         // --- MÉTRICAS DE GIMNASIO ---
         @JsonProperty("work") Integer volumenTotalKg,
 
+        // CORRECCIÓN: Intervals manda el desacople como "pa_hr"
+        @JsonProperty("pa_hr")
+        @JsonAlias({"decoupling"})
+        Double desacopleAerobico,
 
-        @JsonProperty("decoupling") Double desacopleAerobico, // Métrica clave de resistencia
-
-        @JsonProperty("icu_intervals") List<IntervalsLapsDTO> vueltas // ARRAY DE VUELTAS
+        @JsonProperty("icu_intervals")
+        @JsonAlias({"intervals", "laps", "device_laps"})
+        List<IntervalsLapsDTO> vueltas
 ) {}

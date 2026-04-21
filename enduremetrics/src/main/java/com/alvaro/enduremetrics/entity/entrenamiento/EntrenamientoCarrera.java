@@ -31,6 +31,8 @@ public class EntrenamientoCarrera extends Entrenamiento {
     @Column(name = "cadencia_media")
     private Integer cadenciaMedia; // Pasos por minuto (SPM). Ideal: ~180
 
+
+
     @Column(name = "longitud_zancada")
     private Double longitudZancada; // En metros. Ej: 1.25m
 
@@ -39,6 +41,9 @@ public class EntrenamientoCarrera extends Entrenamiento {
 
     @Column(name = "oscilacion_vertical")
     private Double oscilacionVertical; // En centímetros. Cuánto "saltas" al correr
+
+    @Column(name = "desacople_aerobico")
+    private Double desacopleAerobico;
 
     @Column(name = "ratio_vertical")
     private Double ratioVertical; // % (Oscilación / Longitud de zancada). Mide la eficiencia

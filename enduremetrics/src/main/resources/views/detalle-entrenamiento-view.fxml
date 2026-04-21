@@ -4,6 +4,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -84,44 +88,104 @@
                 </VBox>
             </HBox>
 
-            <VBox maxWidth="900.0" spacing="15.0"
-                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-padding: 25;">
-                <Label text="Métricas Fisiológicas" textFill="#2c3e50">
-                    <font>
-                        <Font name="System Bold" size="16.0"/>
-                    </font>
-                </Label>
-                <Separator/>
-                <GridPane hgap="30.0" vgap="15.0">
-                    <columnConstraints>
-                        <ColumnConstraints minWidth="120.0"/>
-                        <ColumnConstraints minWidth="80.0"/>
-                        <ColumnConstraints minWidth="120.0"/>
-                        <ColumnConstraints minWidth="80.0"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                    </rowConstraints>
+            <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
 
-                    <Label style="-fx-font-weight: bold;" text="Rendimiento (W/Kg):" textFill="#7f8c8d"
-                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Label fx:id="lblPotencia" text="---" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Tab text="Resumen Fisiológico">
+                    <VBox spacing="15.0"
+                          style="-fx-background-color: white; -fx-background-radius: 0 0 8 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-padding: 25;">
+                        <GridPane hgap="30.0" vgap="15.0">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="120.0"/>
+                                <ColumnConstraints minWidth="80.0"/>
+                                <ColumnConstraints minWidth="120.0"/>
+                                <ColumnConstraints minWidth="80.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+                            </rowConstraints>
 
-                    <Label style="-fx-font-weight: bold;" text="Frec. Cardíaca:" textFill="#7f8c8d"
-                           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <Label fx:id="lblFrecCardiaca" text="---" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                            <Label style="-fx-font-weight: bold;" text="Rendimiento (W/Kg):" textFill="#7f8c8d" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Label fx:id="lblPotencia" text="---" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-                    <Label style="-fx-font-weight: bold;" text="Estrés (TSS):" textFill="#7f8c8d"
-                           GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <Label fx:id="lblTss" text="---" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                            <Label style="-fx-font-weight: bold;" text="Frec. Cardíaca:" textFill="#7f8c8d" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Label fx:id="lblFrecCardiaca" text="---" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                    <Label style="-fx-font-weight: bold;" text="Desnivel:" textFill="#7f8c8d" GridPane.columnIndex="2"
-                           GridPane.rowIndex="1"/>
-                    <Label fx:id="lblDesnivel" text="---" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                </GridPane>
-            </VBox>
+                            <Label style="-fx-font-weight: bold;" text="Estrés (TSS):" textFill="#7f8c8d" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                            <Label fx:id="lblTss" text="---" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
+                            <Label style="-fx-font-weight: bold;" text="Desnivel:" textFill="#7f8c8d" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                            <Label fx:id="lblDesnivel" text="---" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                        </GridPane>
+                    </VBox>
+                </Tab>
+
+                <Tab text="Análisis por Vueltas">
+                    <VBox spacing="10.0"
+                          style="-fx-background-color: white; -fx-background-radius: 0 0 8 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-padding: 20;">
+
+                        <HBox alignment="CENTER_RIGHT">
+                            <Button text="📋 Copiar" onAction="#copiarTabla"
+                                    style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 15; -fx-background-radius: 4;"/>
+                        </HBox>
+
+                        <TableView fx:id="tablaVueltas" VBox.vgrow="ALWAYS" style="-fx-font-size: 13px;">
+                            <columns>
+                                <TableColumn fx:id="colVuelta" text="#" prefWidth="30" style="-fx-alignment: CENTER;"/>
+                                <TableColumn fx:id="colTipo" text="Tipo" prefWidth="90"/>
+
+                                <TableColumn text="Volumen">
+                                    <columns>
+                                        <TableColumn fx:id="colDistancia" text="Dist. (m)" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colTiempo" text="Tiempo" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colTiempoMov" text="T. Mov" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                    </columns>
+                                </TableColumn>
+
+                                <TableColumn text="Ritmos (min/km)">
+                                    <columns>
+                                        <TableColumn fx:id="colRitmo" text="Medio" prefWidth="60" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colRitmoOptimo" text="Óptimo" prefWidth="60" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colGap" text="GAP" prefWidth="60" style="-fx-alignment: CENTER-RIGHT;"/>
+                                    </columns>
+                                </TableColumn>
+
+                                <TableColumn text="Motor Aeróbico">
+                                    <columns>
+                                        <TableColumn fx:id="colFCMin" text="FC Min" prefWidth="60" style="-fx-alignment: CENTER-RIGHT; -fx-text-fill: #e74c3c;"/>
+                                        <TableColumn fx:id="colFC" text="FC Med" prefWidth="60" style="-fx-alignment: CENTER-RIGHT; -fx-text-fill: #e74c3c;"/>
+                                        <TableColumn fx:id="colFCMax" text="FC Máx" prefWidth="60" style="-fx-alignment: CENTER-RIGHT; -fx-text-fill: #e74c3c;"/>
+                                        <TableColumn fx:id="colCalorias" text="Kcal" prefWidth="60" style="-fx-alignment: CENTER-RIGHT;"/>
+                                    </columns>
+                                </TableColumn>
+
+
+                                <TableColumn text="Dinámica de Carrera">
+                                    <columns>
+                                        <TableColumn fx:id="colCadencia" text="Cad. Med" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colCadenciaMax" text="Cad. Máx" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colZancada" text="Zancada (m)" prefWidth="80" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colTCS" text="TCS (ms)" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colEquilibrio" text="Izq/Der %" prefWidth="80" style="-fx-alignment: CENTER;"/>
+                                        <TableColumn fx:id="colOscilacion" text="Osc. Vert (cm)" prefWidth="90" style="-fx-alignment: CENTER-RIGHT;"/>
+                                        <TableColumn fx:id="colRatio" text="Ratio Vert %" prefWidth="90" style="-fx-alignment: CENTER-RIGHT;"/>
+                                    </columns>
+                                </TableColumn>
+
+                                <TableColumn text="Terreno">
+                                    <columns>
+                                        <TableColumn fx:id="colAscenso" text="+ (m)" prefWidth="50" style="-fx-alignment: CENTER-RIGHT; -fx-text-fill: #27ae60;"/>
+                                        <TableColumn fx:id="colTemp" text="Temp (ºC)" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;"/>
+                                    </columns>
+                                </TableColumn>
+
+                            </columns>
+                        </TableView>
+
+                    </VBox>
+                </Tab>
+
+            </TabPane>
         </VBox>
     </center>
 </BorderPane>
