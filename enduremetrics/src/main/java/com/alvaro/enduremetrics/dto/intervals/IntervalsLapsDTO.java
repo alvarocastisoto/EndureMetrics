@@ -50,11 +50,11 @@ public record IntervalsLapsDTO(
         Integer tiempoContactoSuelo,
 
         @JsonProperty("average_vertical_oscillation")
-        @JsonAlias({"vertical_oscillation"})
+        @JsonAlias({"vertical_oscillation", "AvgVerticalOscillation"})
         Double oscilacionVertical,
 
         @JsonProperty("avg_lr_balance")
-        @JsonAlias({"ground_contact_balance", "gct_balance", "average_gct_balance"})
+        @JsonAlias({"ground_contact_balance", "gct_balance", "average_gct_balance", "GarminGCTBalance"})
         Double equilibrioTcsIzquierda,
         @JsonProperty("vertical_ratio") Double relacionVertical,
 

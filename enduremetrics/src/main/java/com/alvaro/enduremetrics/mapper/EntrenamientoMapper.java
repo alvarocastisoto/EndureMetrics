@@ -82,19 +82,35 @@ public class EntrenamientoMapper {
             v.setFrecuenciaCardiacaMinima(dto.frecuenciaCardiacaMinima());
             v.setFrecuenciaCardiacaMedia(dto.frecuenciaCardiacaMedia());
             v.setFrecuenciaCardiacaMaxima(dto.frecuenciaCardiacaMaxima());
-            v.setCadenciaMedia(dto.cadenciaMedia() * 2);
-            v.setCadenciaMaxima(dto.cadenciaMaxima() * 2);
+            if (dto.cadenciaMedia() != null) v.setCadenciaMedia(dto.cadenciaMedia() * 2);
+            if (dto.cadenciaMaxima() != null) v.setCadenciaMaxima(dto.cadenciaMaxima() * 2);
             v.setAscensoTotal(dto.ascensoTotal());
             v.setPotenciaMedia(dto.potenciaMedia());
             v.setPotenciaNormalizada(dto.potenciaNormalizada());
             v.setLongitudZancadaMedia(dto.longitudZancadaMedia());
+            if (dto.equilibrioTcsIzquierda() != null) {
+                double izq = dto.equilibrioTcsIzquierda();
+                v.setEquilibrioTcsIzquierda(izq);
+                // Si tienes el campo en la entidad, guárdalo ya calculado:
+                // v.setEquilibrioTcsDerecha(100.0 - izq);
+            }
             v.setTiempoContactoSuelo(dto.tiempoContactoSuelo());
 
             // <-- AÑADIDO: Te faltaba mapear el equilibrio TCS en las vueltas
             v.setEquilibrioTcsIzquierda(dto.equilibrioTcsIzquierda());
-
+            if (dto.oscilacionVertical() != null) {
+                v.setOscilacionVertical(dto.oscilacionVertical() / 10.0);
+            }
             v.setOscilacionVertical(dto.oscilacionVertical());
-            v.setRelacionVertical(dto.relacionVertical());
+            // --- RATIO VERTICAL % (El KPI de eficiencia) ---
+            if (dto.relacionVertical() != null) {
+                v.setRelacionVertical(dto.relacionVertical());
+            } else if (dto.oscilacionVertical() != null && dto.longitudZancadaMedia() != null && dto.longitudZancadaMedia() > 0) {
+                // Fórmula: (Oscilacion_m / Zancada_m) * 100
+                double voMetros = dto.oscilacionVertical() / 100.0;
+                double ratio = (voMetros / dto.longitudZancadaMedia()) * 100;
+                v.setRelacionVertical(ratio);
+            }
             v.setTemperaturaMedia(dto.temperaturaMedia());
             return v;
         }).toList();

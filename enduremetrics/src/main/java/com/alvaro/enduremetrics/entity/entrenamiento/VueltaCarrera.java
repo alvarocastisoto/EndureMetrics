@@ -86,6 +86,7 @@ public class VueltaCarrera {
     // No hace falta guardar la derecha, si la izq es 50.8, la derecha es 49.2 por matemáticas básicas.
 
     @Column(name = "oscilacion_vertical")
+
     private Double oscilacionVertical; // En centímetros
 
     @Column(name = "relacion_vertical")
