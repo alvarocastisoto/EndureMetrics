@@ -32,7 +32,9 @@ public class EntrenamientoMapper {
                 carrera.setCadenciaMedia(dto.cadenciaMedia());
                 carrera.setLongitudZancada(dto.longitudZancada());
                 carrera.setTiempoContactoSuelo(dto.tiempoContactoSuelo());
-                carrera.setOscilacionVertical(dto.oscilacionVertical());
+                if (dto.oscilacionVertical() != null) {
+                    carrera.setOscilacionVertical(dto.oscilacionVertical() / 10.0); // /10 aquí también
+                }
                 carrera.setRatioVertical(dto.ratioVertical());
 
                 carrera.setDesacopleAerobico(dto.desacopleAerobico());
@@ -101,13 +103,12 @@ public class EntrenamientoMapper {
             if (dto.oscilacionVertical() != null) {
                 v.setOscilacionVertical(dto.oscilacionVertical() / 10.0);
             }
-            v.setOscilacionVertical(dto.oscilacionVertical());
             // --- RATIO VERTICAL % (El KPI de eficiencia) ---
             if (dto.relacionVertical() != null) {
                 v.setRelacionVertical(dto.relacionVertical());
             } else if (dto.oscilacionVertical() != null && dto.longitudZancadaMedia() != null && dto.longitudZancadaMedia() > 0) {
                 // Fórmula: (Oscilacion_m / Zancada_m) * 100
-                double voMetros = dto.oscilacionVertical() / 100.0;
+                double voMetros = dto.oscilacionVertical() / 1000.0;
                 double ratio = (voMetros / dto.longitudZancadaMedia()) * 100;
                 v.setRelacionVertical(ratio);
             }

@@ -110,12 +110,10 @@ public class DetalleEntrenamientoController {
     public void cargarDatos(Entrenamiento entreno) {
         // 1. Datos Universales
         lblDeporte.setText(entreno.getClass().getSimpleName().replace("Entrenamiento", ""));
-
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy - HH:mm");
         lblFecha.setText(entreno.getFechaInicio().format(formatter));
 
         lblDistancia.setText(entreno.getDistancia() != null ? String.format("%.2f km", entreno.getDistancia() / 1000.0) : "-");
-
         if (entreno.getTiempoMovimiento() != null) {
             Duration d = Duration.ofSeconds(entreno.getTiempoMovimiento());
             lblDuracion.setText(String.format("%d:%02d:%02d", d.toHoursPart(), d.toMinutesPart(), d.toSecondsPart()));
@@ -124,14 +122,13 @@ public class DetalleEntrenamientoController {
         lblTss.setText(entreno.getCargaTss() != null ? String.valueOf(entreno.getCargaTss()) : "N/A");
         lblFrecCardiaca.setText(entreno.getFrecuenciaCardiacaMedia() != null ? entreno.getFrecuenciaCardiacaMedia() + " ppm" : "N/A");
 
-        // 2. Datos Específicos y Tabla
+        // 2. Lógica de Tabla y Fila de Resumen
         if (entreno instanceof EntrenamientoCarrera carrera) {
             lblDesnivel.setText(carrera.getDesnivelPositivo() != null ? carrera.getDesnivelPositivo() + " m" : "0 m");
             lblPotencia.setText(carrera.getPotenciaCarreraMedia() != null ? carrera.getPotenciaCarreraMedia() + " W" : "N/A");
 
             if (carrera.getVueltas() != null && !carrera.getVueltas().isEmpty()) {
-                // Creamos la lista combinada (Vueltas + Fila Resumen)
-                List<VueltaCarrera> listaParaTabla = new java.util.ArrayList<>(carrera.getVueltas());
+                List<VueltaCarrera> listaParaTabla = new ArrayList<>(carrera.getVueltas());
 
                 VueltaCarrera filaResumen = calcularFilaResumen(carrera.getVueltas());
                 if (filaResumen != null) {
@@ -139,8 +136,7 @@ public class DetalleEntrenamientoController {
                 }
 
                 tablaVueltas.setItems(javafx.collections.FXCollections.observableArrayList(listaParaTabla));
-
-                // Desactivar sort para que la fila resumen no se mueva al hacer clic en cabeceras
+                // Bloqueamos el ordenamiento para que la fila resumen no se mueva
                 tablaVueltas.getColumns().forEach(column -> column.setSortable(false));
             }
         } else if (entreno instanceof EntrenamientoGimnasio gym) {
@@ -298,37 +294,49 @@ public class DetalleEntrenamientoController {
         VueltaCarrera res = new VueltaCarrera();
         res.setTipoPaso("PROMEDIO/TOTAL");
 
-        // --- SUMAS ---
+        // --- 1. TOTALES (Sumas de la sesión) ---
         double dTot = vueltas.stream().mapToDouble(VueltaCarrera::getDistanciaMetros).sum();
         int tTot = vueltas.stream().mapToInt(VueltaCarrera::getTiempoSegundos).sum();
+        int tMovTot = vueltas.stream().mapToInt(v -> v.getTiempoMovimientoSegundos() != null ? v.getTiempoMovimientoSegundos() : 0).sum();
         int kcalTot = vueltas.stream().mapToInt(v -> v.getCalorias() != null ? v.getCalorias() : 0).sum();
         double ascTot = vueltas.stream().mapToDouble(v -> v.getAscensoTotal() != null ? v.getAscensoTotal() : 0).sum();
 
         res.setDistanciaMetros(dTot);
         res.setTiempoSegundos(tTot);
+        res.setTiempoMovimientoSegundos(tMovTot);
         res.setCalorias(kcalTot);
         res.setAscensoTotal((int) ascTot);
 
-        // --- RITMO MEDIO (Debe ser Tiempo/Distancia, no la media de los ritmos) ---
+        // --- 2. RITMO MEDIO REAL (Total Dist / Total Tiempo) ---
         if (dTot > 0) res.setRitmoMedio(dTot / tTot);
 
-        // --- MEDIAS (Filtramos ceros y nulos para no falsear el promedio) ---
-        res.setFrecuenciaCardiacaMedia((int) vueltas.stream().mapToInt(v -> v.getFrecuenciaCardiacaMedia() != null ? v.getFrecuenciaCardiacaMedia() : 0).filter(f -> f > 0).average().orElse(0));
-        res.setCadenciaMedia((int) vueltas.stream().mapToDouble(v -> v.getCadenciaMedia() != null ? v.getCadenciaMedia() : 0).filter(c -> c > 0).average().orElse(0));
-        res.setLongitudZancadaMedia(vueltas.stream().mapToDouble(v -> v.getLongitudZancadaMedia() != null ? v.getLongitudZancadaMedia() : 0).filter(z -> z > 0).average().orElse(0));
-        res.setTiempoContactoSuelo((int) vueltas.stream().mapToDouble(v -> v.getTiempoContactoSuelo() != null ? v.getTiempoContactoSuelo() : 0).filter(t -> t > 0).average().orElse(0));
-        res.setOscilacionVertical(vueltas.stream().mapToDouble(v -> v.getOscilacionVertical() != null ? v.getOscilacionVertical() : 0).filter(o -> o > 0).average().orElse(0));
-        res.setEquilibrioTcsIzquierda(vueltas.stream().mapToDouble(v -> v.getEquilibrioTcsIzquierda() != null ? v.getEquilibrioTcsIzquierda() : 0).filter(e -> e > 0).average().orElse(0));
+        // --- 3. MEDIAS (Promedios de los valores de cada vuelta) ---
+        // Ritmos Técnicos
+        res.setRitmoOptimo(vueltas.stream().filter(v -> v.getRitmoOptimo() != null).mapToDouble(VueltaCarrera::getRitmoOptimo).average().orElse(0));
+        res.setGapMedio(vueltas.stream().filter(v -> v.getGapMedio() != null).mapToDouble(VueltaCarrera::getGapMedio).average().orElse(0));
 
-        // --- RATIO VERTICAL % (Calculado sobre las medias) ---
+        // Motor Aeróbico (FCs)
+        res.setFrecuenciaCardiacaMinima((int) vueltas.stream().filter(v -> v.getFrecuenciaCardiacaMinima() != null).mapToInt(VueltaCarrera::getFrecuenciaCardiacaMinima).average().orElse(0));
+        res.setFrecuenciaCardiacaMedia((int) vueltas.stream().filter(v -> v.getFrecuenciaCardiacaMedia() != null).mapToInt(VueltaCarrera::getFrecuenciaCardiacaMedia).average().orElse(0));
+        res.setFrecuenciaCardiacaMaxima((int) vueltas.stream().filter(v -> v.getFrecuenciaCardiacaMaxima() != null).mapToInt(VueltaCarrera::getFrecuenciaCardiacaMaxima).average().orElse(0));
+
+        // Dinámica de Carrera
+        res.setCadenciaMedia((int) vueltas.stream().filter(v -> v.getCadenciaMedia() != null).mapToDouble(VueltaCarrera::getCadenciaMedia).average().orElse(0));
+        res.setCadenciaMaxima((int) vueltas.stream().filter(v -> v.getCadenciaMaxima() != null).mapToDouble(VueltaCarrera::getCadenciaMaxima).average().orElse(0));
+        res.setLongitudZancadaMedia(vueltas.stream().filter(v -> v.getLongitudZancadaMedia() != null).mapToDouble(VueltaCarrera::getLongitudZancadaMedia).average().orElse(0));
+        res.setTiempoContactoSuelo((int) vueltas.stream().filter(v -> v.getTiempoContactoSuelo() != null).mapToDouble(VueltaCarrera::getTiempoContactoSuelo).average().orElse(0));
+        res.setOscilacionVertical(vueltas.stream().filter(v -> v.getOscilacionVertical() != null).mapToDouble(VueltaCarrera::getOscilacionVertical).average().orElse(0));
+        res.setEquilibrioTcsIzquierda(vueltas.stream().filter(v -> v.getEquilibrioTcsIzquierda() != null).mapToDouble(VueltaCarrera::getEquilibrioTcsIzquierda).average().orElse(0));
+
+        // --- 4. RATIO VERTICAL FINAL ---
         if (res.getLongitudZancadaMedia() > 0 && res.getOscilacionVertical() > 0) {
-            double voMetros = res.getOscilacionVertical() / 100.0; // cm a metros
-            res.setRelacionVertical((voMetros / res.getLongitudZancadaMedia()) * 10);
+            // Oscilación en cm (ya viene así del Mapper) a metros / zancada en metros
+            double voMetros = res.getOscilacionVertical() / 100.0;
+            res.setRelacionVertical((voMetros / res.getLongitudZancadaMedia()) * 100);
         }
 
         return res;
     }
-
 
     // Transforma m/s de Intervals a formato min/km clásico
     private String formatearRitmo(Double metrosPorSegundo) {
