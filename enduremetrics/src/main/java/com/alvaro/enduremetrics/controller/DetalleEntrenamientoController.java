@@ -17,6 +17,8 @@ import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
@@ -44,32 +46,58 @@ public class DetalleEntrenamientoController {
     private Label lblDesnivel;
     @FXML
     private Label lblPotencia;
-    @FXML private TableView<VueltaCarrera> tablaVueltas;
-    @FXML private TableColumn<VueltaCarrera, String> colVuelta;
-    @FXML private TableColumn<VueltaCarrera, String> colTipo;
-    @FXML private TableColumn<VueltaCarrera, String> colDistancia;
-    @FXML private TableColumn<VueltaCarrera, String> colTiempo;
-    @FXML private TableColumn<VueltaCarrera, String> colTiempoMov;
-    @FXML private TableColumn<VueltaCarrera, String> colRitmo;
-    @FXML private TableColumn<VueltaCarrera, String> colRitmoOptimo;
-    @FXML private TableColumn<VueltaCarrera, String> colGap;
-    @FXML private TableColumn<VueltaCarrera, String> colFCMin;
-    @FXML private TableColumn<VueltaCarrera, String> colFC;
-    @FXML private TableColumn<VueltaCarrera, String> colFCMax;
-    @FXML private TableColumn<VueltaCarrera, String> colCalorias;
-    @FXML private TableColumn<VueltaCarrera, String> colPotencia;
-    @FXML private TableColumn<VueltaCarrera, String> colPotenciaMax;
-    @FXML private TableColumn<VueltaCarrera, String> colPotenciaNP;
-    @FXML private TableColumn<VueltaCarrera, String> colWkg;
-    @FXML private TableColumn<VueltaCarrera, String> colCadencia;
-    @FXML private TableColumn<VueltaCarrera, String> colCadenciaMax;
-    @FXML private TableColumn<VueltaCarrera, String> colZancada;
-    @FXML private TableColumn<VueltaCarrera, String> colTCS;
-    @FXML private TableColumn<VueltaCarrera, String> colEquilibrio;
-    @FXML private TableColumn<VueltaCarrera, String> colOscilacion;
-    @FXML private TableColumn<VueltaCarrera, String> colRatio;
-    @FXML private TableColumn<VueltaCarrera, String> colAscenso;
-    @FXML private TableColumn<VueltaCarrera, String> colTemp;
+    @FXML
+    private TableView<VueltaCarrera> tablaVueltas;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colVuelta;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colTipo;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colDistancia;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colTiempo;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colTiempoMov;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colRitmo;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colRitmoOptimo;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colGap;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colFCMin;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colFC;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colFCMax;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colCalorias;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colPotencia;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colPotenciaMax;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colPotenciaNP;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colWkg;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colCadencia;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colCadenciaMax;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colZancada;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colTCS;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colEquilibrio;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colOscilacion;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colRatio;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colAscenso;
+    @FXML
+    private TableColumn<VueltaCarrera, String> colTemp;
 
 
     private final ApplicationContext springContext;
@@ -80,50 +108,65 @@ public class DetalleEntrenamientoController {
     }
 
     public void cargarDatos(Entrenamiento entreno) {
-        // 1. Datos Universales (Clase Padre)
+        // 1. Datos Universales
         lblDeporte.setText(entreno.getClass().getSimpleName().replace("Entrenamiento", ""));
 
-        // Formateo de fecha limpio
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy - HH:mm");
         lblFecha.setText(entreno.getFechaInicio().format(formatter));
 
-        if (entreno.getDistancia() != null) {
-            lblDistancia.setText(String.format("%.2f km", entreno.getDistancia() / 1000.0));
-        } else {
-            lblDistancia.setText("-");
-        }
+        lblDistancia.setText(entreno.getDistancia() != null ? String.format("%.2f km", entreno.getDistancia() / 1000.0) : "-");
 
         if (entreno.getTiempoMovimiento() != null) {
             Duration d = Duration.ofSeconds(entreno.getTiempoMovimiento());
             lblDuracion.setText(String.format("%d:%02d:%02d", d.toHoursPart(), d.toMinutesPart(), d.toSecondsPart()));
-        } else {
-            lblDuracion.setText("-");
         }
 
         lblTss.setText(entreno.getCargaTss() != null ? String.valueOf(entreno.getCargaTss()) : "N/A");
         lblFrecCardiaca.setText(entreno.getFrecuenciaCardiacaMedia() != null ? entreno.getFrecuenciaCardiacaMedia() + " ppm" : "N/A");
 
-        // 2. Datos Específicos por Biomecánica (Polimorfismo limpio)
+        // 2. Datos Específicos y Tabla
         if (entreno instanceof EntrenamientoCarrera carrera) {
             lblDesnivel.setText(carrera.getDesnivelPositivo() != null ? carrera.getDesnivelPositivo() + " m" : "0 m");
             lblPotencia.setText(carrera.getPotenciaCarreraMedia() != null ? carrera.getPotenciaCarreraMedia() + " W" : "N/A");
 
-            // Llenar la tabla
             if (carrera.getVueltas() != null && !carrera.getVueltas().isEmpty()) {
-                tablaVueltas.getItems().setAll(carrera.getVueltas());
+                // Creamos la lista combinada (Vueltas + Fila Resumen)
+                List<VueltaCarrera> listaParaTabla = new java.util.ArrayList<>(carrera.getVueltas());
+
+                VueltaCarrera filaResumen = calcularFilaResumen(carrera.getVueltas());
+                if (filaResumen != null) {
+                    listaParaTabla.add(filaResumen);
+                }
+
+                tablaVueltas.setItems(javafx.collections.FXCollections.observableArrayList(listaParaTabla));
+
+                // Desactivar sort para que la fila resumen no se mueva al hacer clic en cabeceras
+                tablaVueltas.getColumns().forEach(column -> column.setSortable(false));
             }
         } else if (entreno instanceof EntrenamientoGimnasio gym) {
             lblDesnivel.setText("-");
             lblPotencia.setText(gym.getVolumenTotalKg() != null ? gym.getVolumenTotalKg() + " kg (Vol)" : "N/A");
-        } else {
-            lblDesnivel.setText("-");
-            lblPotencia.setText("-");
+            tablaVueltas.getItems().clear();
         }
     }
 
     @FXML
     public void initialize() {
         configurarColumnasTabla();
+        tablaVueltas.setRowFactory(tv -> new javafx.scene.control.TableRow<>() {
+            @Override
+            protected void updateItem(VueltaCarrera item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || item.getTipoPaso() == null) {
+                    setStyle("");
+                } else if (item.getTipoPaso().equals("PROMEDIO/TOTAL")) {
+                    // Fondo gris claro, texto en negrita y borde superior para separar
+                    setStyle("-fx-background-color: #f8f9fa; -fx-font-weight: bold; -fx-border-color: #dee2e6 transparent transparent transparent;");
+                } else {
+                    setStyle("");
+                }
+            }
+        });
     }
 
     private void configurarColumnasTabla() {
@@ -169,7 +212,6 @@ public class DetalleEntrenamientoController {
         colZancada.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getLongitudZancadaMedia() != null ? String.format("%.2f", cell.getValue().getLongitudZancadaMedia()) : "-"));
         colTCS.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getTiempoContactoSuelo() != null ? String.valueOf(cell.getValue().getTiempoContactoSuelo()) : "-"));
 
-        // Magia del Equilibrio (Si tienes 50.8 izquierda, calculamos la derecha al vuelo)
         colEquilibrio.setCellValueFactory(cell -> {
             Double izq = cell.getValue().getEquilibrioTcsIzquierda();
             if (izq == null) return new javafx.beans.property.SimpleStringProperty("-");
@@ -249,6 +291,44 @@ public class DetalleEntrenamientoController {
             e.printStackTrace();
         }
     }
+
+    private VueltaCarrera calcularFilaResumen(List<VueltaCarrera> vueltas) {
+        if (vueltas == null || vueltas.isEmpty()) return null;
+
+        VueltaCarrera res = new VueltaCarrera();
+        res.setTipoPaso("PROMEDIO/TOTAL");
+
+        // --- SUMAS ---
+        double dTot = vueltas.stream().mapToDouble(VueltaCarrera::getDistanciaMetros).sum();
+        int tTot = vueltas.stream().mapToInt(VueltaCarrera::getTiempoSegundos).sum();
+        int kcalTot = vueltas.stream().mapToInt(v -> v.getCalorias() != null ? v.getCalorias() : 0).sum();
+        double ascTot = vueltas.stream().mapToDouble(v -> v.getAscensoTotal() != null ? v.getAscensoTotal() : 0).sum();
+
+        res.setDistanciaMetros(dTot);
+        res.setTiempoSegundos(tTot);
+        res.setCalorias(kcalTot);
+        res.setAscensoTotal((int) ascTot);
+
+        // --- RITMO MEDIO (Debe ser Tiempo/Distancia, no la media de los ritmos) ---
+        if (dTot > 0) res.setRitmoMedio(dTot / tTot);
+
+        // --- MEDIAS (Filtramos ceros y nulos para no falsear el promedio) ---
+        res.setFrecuenciaCardiacaMedia((int) vueltas.stream().mapToInt(v -> v.getFrecuenciaCardiacaMedia() != null ? v.getFrecuenciaCardiacaMedia() : 0).filter(f -> f > 0).average().orElse(0));
+        res.setCadenciaMedia((int) vueltas.stream().mapToDouble(v -> v.getCadenciaMedia() != null ? v.getCadenciaMedia() : 0).filter(c -> c > 0).average().orElse(0));
+        res.setLongitudZancadaMedia(vueltas.stream().mapToDouble(v -> v.getLongitudZancadaMedia() != null ? v.getLongitudZancadaMedia() : 0).filter(z -> z > 0).average().orElse(0));
+        res.setTiempoContactoSuelo((int) vueltas.stream().mapToDouble(v -> v.getTiempoContactoSuelo() != null ? v.getTiempoContactoSuelo() : 0).filter(t -> t > 0).average().orElse(0));
+        res.setOscilacionVertical(vueltas.stream().mapToDouble(v -> v.getOscilacionVertical() != null ? v.getOscilacionVertical() : 0).filter(o -> o > 0).average().orElse(0));
+        res.setEquilibrioTcsIzquierda(vueltas.stream().mapToDouble(v -> v.getEquilibrioTcsIzquierda() != null ? v.getEquilibrioTcsIzquierda() : 0).filter(e -> e > 0).average().orElse(0));
+
+        // --- RATIO VERTICAL % (Calculado sobre las medias) ---
+        if (res.getLongitudZancadaMedia() > 0 && res.getOscilacionVertical() > 0) {
+            double voMetros = res.getOscilacionVertical() / 100.0; // cm a metros
+            res.setRelacionVertical((voMetros / res.getLongitudZancadaMedia()) * 10);
+        }
+
+        return res;
+    }
+
 
     // Transforma m/s de Intervals a formato min/km clásico
     private String formatearRitmo(Double metrosPorSegundo) {
