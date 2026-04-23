@@ -130,22 +130,33 @@ public class IntervalsService {
     }
 
 
-    @Async
+
     @Transactional
     public void sincronizacionBackground(Usuario usuarioSession) {
 
         try {
-            System.out.println("Iniciando sincronización en segundo plano");
+            System.out.println("Iniciando sincronización con Intervals...");
 
             obtenerCredenciales(usuarioSession).ifPresent(creds -> {
+                // 1. Validar y traer datos del atleta (Peso, etc.)
                 IntervalsAthleteDTO atleta = probarConexion(usuarioSession);
                 sincronizarDatosAtleta(usuarioSession, atleta);
-                System.out.println("Sincronización completada con éxito");
+
+                // 2. EL ESLABÓN PERDIDO: Descargar el historial (Array general de actividades)
+                System.out.println("Buscando nuevas carreras...");
+                List<IntervalsActivityDTO> historialDescargado = descargaHistorialActividades(usuarioSession);
+
+                // 3. Guardar en Base de Datos Local
+                if (historialDescargado != null && !historialDescargado.isEmpty()) {
+                    guardarHistorialEnBD(usuarioSession, historialDescargado);
+                }
+
+                System.out.println("Sincronización completada con éxito. Base de datos actualizada.");
             });
         } catch (Exception e) {
-            System.out.println("Error al sincronizar en segundo plano: " + e.getMessage());
+            System.out.println("Error al sincronizar con Intervals: " + e.getMessage());
+            throw new RuntimeException("Fallo en la sincronización: " + e.getMessage());
         }
-
     }
 
 
