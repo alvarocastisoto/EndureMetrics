@@ -1,14 +1,10 @@
 package com.alvaro.enduremetrics.service;
 
-import com.alvaro.enduremetrics.dto.intervals.IntervalsActivityDTO;
-import com.alvaro.enduremetrics.dto.intervals.IntervalsAthleteDTO;
-import com.alvaro.enduremetrics.dto.intervals.IntervalsDTO;
-import com.alvaro.enduremetrics.dto.intervals.IntervalsUpdateProfileDTO;
+import com.alvaro.enduremetrics.dto.intervals.*;
 import com.alvaro.enduremetrics.entity.IntervalsCredentials;
 import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
-import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCiclismo;
 import com.alvaro.enduremetrics.entity.entrenamiento.VueltaCarrera;
 import com.alvaro.enduremetrics.mapper.EntrenamientoMapper;
 import com.alvaro.enduremetrics.repository.EntrenamientoRepository;
@@ -120,15 +116,29 @@ public class IntervalsService {
         if (atletaDTO.peso() != null && atletaDTO.peso() > 0) {
             usuarioGestionado.setPeso(atletaDTO.peso());
             hayCambios = true;
-            System.out.println("Sincronizando peso desde Intervals: " + atletaDTO.peso());
+        }
+
+        if (atletaDTO.fcReposo() != null) {
+            usuarioGestionado.setFcReposo(atletaDTO.fcReposo());
+            hayCambios = true; // <-- AÑADIDO
+        }
+        if (atletaDTO.sportSettings() != null) {
+            var settingRun = atletaDTO.sportSettings().stream()
+                    .filter(s -> s.types() != null && s.types().contains("Run"))
+                    .findFirst();
+
+            // Al hacerlo con un if normal, estamos fuera de la lambda y podemos modificar hayCambios
+            if (settingRun.isPresent() && settingRun.get().fcm() != null) {
+                usuarioGestionado.setFcMax(settingRun.get().fcm());
+                hayCambios = true;
+            }
         }
 
         if (hayCambios) {
             usuarioRepository.save(usuarioGestionado);
-            userSession.setUsuarioLogueado(usuarioGestionado);
+            userSession.setUsuarioLogueado(usuarioGestionado); // Refrescamos la sesión aquí también
         }
     }
-
 
     @Async
     @Transactional
@@ -150,22 +160,56 @@ public class IntervalsService {
 
 
     @Async
-    public void actualizarPerfilIntervals(Usuario usuarioSession, Double nuevoPeso, Double altura, LocalDate fechaNacimiento, String sexoUi) {
+    public void actualizarPerfilIntervals(Usuario usuarioSession, Double nuevoPeso, Double altura, LocalDate fechaNacimiento, String sexoUi, Integer fcMax, Integer fcReposo) {
         try {
             obtenerCredenciales(usuarioSession).ifPresent(creds -> {
                 String authRaw = "API_KEY:" + creds.apiKey();
                 String encodedAuth = Base64.getEncoder().encodeToString(authRaw.getBytes());
 
-                // 1. Convertimos centímetros a metros
-                Double alturaApi = (altura != null) ? altura / 100.0 : null;
+                IntervalsAthleteDTO perfilActual = restClient.get()
+                        .uri("/athlete/{id}", creds.athleteId())
+                        .header("Authorization", "Basic " + encodedAuth)
+                        .retrieve()
+                        .body(IntervalsAthleteDTO.class);
 
-                // 2. Traducimos el idioma
+                if (perfilActual == null) {
+                    System.err.println("[PUSH ERROR] No se pudo descargar el perfil base de Intervals.");
+                    return;
+                }
+
+                java.util.List<IntervalsSportSettingDTO> settingsActualizados = new java.util.ArrayList<>();
+
+                if (perfilActual.sportSettings() != null) {
+                    for (IntervalsSportSettingDTO settingViejo : perfilActual.sportSettings()) {
+                        if (settingViejo.types() != null && settingViejo.types().contains("Run")) {
+                            // Encontramos el de carrera: Clonamos los datos viejos pero metemos la nueva FC MAX
+                            settingsActualizados.add(new IntervalsSportSettingDTO(
+                                    settingViejo.id(),             // ¡VITAL! Mantenemos el ID original
+                                    settingViejo.types(),
+                                    settingViejo.ftp(),
+                                    settingViejo.umbralLactato(),
+                                    fcMax                          // <-- NUESTRO NUEVO VALOR
+                            ));
+                        } else {
+                            // Es ciclismo, natación, etc. Lo metemos a la lista tal cual
+                            settingsActualizados.add(settingViejo);
+                        }
+                    }
+                }
+
+                Double alturaApi = (altura != null) ? altura / 100.0 : null;
                 String sexoApi = null;
                 if ("Hombre".equals(sexoUi)) sexoApi = "M";
                 else if ("Mujer".equals(sexoUi)) sexoApi = "F";
 
-                // 3. Pasamos las variables CORRECTAS (alturaApi y sexoApi)
-                IntervalsUpdateProfileDTO updateDTO = new IntervalsUpdateProfileDTO(nuevoPeso, alturaApi, fechaNacimiento, sexoApi);
+                IntervalsUpdateProfileDTO updateDTO = new IntervalsUpdateProfileDTO(
+                        nuevoPeso,
+                        alturaApi,
+                        fechaNacimiento,
+                        sexoApi,
+                        fcReposo,             // La FC de reposo va en la raíz
+                        settingsActualizados  // La lista que acabamos de reconstruir
+                );
 
                 System.out.println("[PUSH] Subiendo nuevo perfil a Intervals...");
 
@@ -180,6 +224,7 @@ public class IntervalsService {
             });
         } catch (Exception e) {
             System.err.println("[PUSH ERROR] No se pudo actualizar el perfil en Intervals: " + e.getMessage());
+            e.printStackTrace(); // Para ver exactamente dónde falla si ocurre un error
         }
     }
 
