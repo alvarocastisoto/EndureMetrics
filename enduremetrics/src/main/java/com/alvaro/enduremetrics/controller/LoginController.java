@@ -74,34 +74,67 @@ public class LoginController {
             return;
         }
 
-        // 2. Intentar loguear y atrapar los errores
         try {
-
-            Usuario usuarioLogueado = loginService.validarCredenciales(usernameField.getText(),
-                    passwordField.getText());
+            // Validar en BBDD local (Esto es súper rápido, va en el hilo principal)
+            Usuario usuarioLogueado = loginService.validarCredenciales(usernameField.getText(), passwordField.getText());
             userSession.setUsuarioLogueado(usuarioLogueado);
-            intervalsService.sincronizacionBackground(usuarioLogueado);
-            errorLabel.setTextFill(javafx.scene.paint.Color.web("#27ae60")); // Verde éxito
-            mostrarError(null, "¡Conectando...");
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/main-view.fxml"));
-            loader.setControllerFactory(springContext::getBean);
-            Parent root = loader.load();
-            Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setMaximized(true);
-            stage.centerOnScreen();
+            // 2. Feedback visual inmediato y bloqueo de inputs para evitar doble clic
+            errorLabel.setTextFill(javafx.scene.paint.Color.web("#27ae60")); // Verde éxito
+            mostrarError(null, "¡Logueado! Sincronizando con Intervals...");
+            usernameField.setDisable(true);
+            passwordField.setDisable(true);
+
+            // 3. Crear el hilo secundario para la API
+            javafx.concurrent.Task<Void> tareaSincronizacion = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    // ESTO ES LO QUE TARDA: Peticiones HTTP y guardado en BBDD
+                    intervalsService.sincronizacionBackground(usuarioLogueado);
+                    return null;
+                }
+            };
+
+            // 4. Qué hacer cuando la API termine con éxito (Volver al Hilo UI)
+            tareaSincronizacion.setOnSucceeded(event -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/main-view.fxml"));
+                    loader.setControllerFactory(springContext::getBean);
+                    Parent root = loader.load();
+                    Stage stage = (Stage) usernameField.getScene().getWindow();
+                    stage.setScene(new Scene(root));
+                    stage.setMaximized(true);
+                    stage.centerOnScreen();
+                } catch (IOException e) {
+                    mostrarError(null, "Error al cargar la pantalla principal.");
+                    e.printStackTrace();
+                }
+            });
+
+            // 5. Qué hacer si la API de Intervals falla (ej. sin internet)
+            tareaSincronizacion.setOnFailed(event -> {
+                errorLabel.setTextFill(javafx.scene.paint.Color.web("#e67e22")); // Naranja aviso
+                mostrarError(null, "Fallo al sincronizar. Entrando en modo local...");
+
+                // Opcional: Podrías redirigirlo al main-view igualmente copiando el bloque try-catch de arriba
+                // para que use la app offline.
+                tareaSincronizacion.getException().printStackTrace();
+
+                // Desbloqueamos los campos por si quiere reintentar
+                usernameField.setDisable(false);
+                passwordField.setDisable(false);
+            });
+
+            // 6. ¡Arrancar el hilo!
+            new Thread(tareaSincronizacion).start();
 
         } catch (IllegalArgumentException e) {
             // Aquí atrapamos el error "Usuario o contraseña incorrectos" del Service
             mostrarError(null, e.getMessage());
-        } catch (IOException e) {
-            // Si el archivo main-view.fxml no existe o falla al cargar
-            mostrarError(null, "Error al cargar la pantalla principal.");
-            e.printStackTrace();
         } catch (Exception e) {
-            // Cualquier otro fallo grave (ej: Base de datos caída)
+            // Cualquier otro fallo grave
             mostrarError(null, "Error interno del servidor.");
+            e.printStackTrace();
         }
     }
 
