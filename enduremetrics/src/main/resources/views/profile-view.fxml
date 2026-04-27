@@ -75,6 +75,25 @@
             <DatePicker fx:id="fechaNacimientoPicker" maxWidth="1.7976931348623157E308"/>
         </VBox>
 
+        <HBox spacing="15.0">
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="FC Máxima (ppm)" textFill="#64748b">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="fcMaxField" promptText="Ej. 190"/>
+            </VBox>
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="FC Reposo (ppm)" textFill="#64748b">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="fcReposoField" promptText="Ej. 45"/>
+            </VBox>
+        </HBox>
+
         <Label fx:id="mensajeLabel" visible="false">
             <font>
                 <Font size="13.0" />

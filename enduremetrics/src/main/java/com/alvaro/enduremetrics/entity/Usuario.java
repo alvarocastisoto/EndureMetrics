@@ -6,7 +6,6 @@ import java.util.List; // Añadido para que no rompa la compilación
 import java.util.UUID;
 
 import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
-import com.alvaro.enduremetrics.util.StringCryptoConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +38,10 @@ public class Usuario {
     private Integer altura;
     private LocalDate fechaNacimiento;
     private String sexo;
+
+    // Datos frecuencia
+    private Integer fcReposo;
+    private Integer fcMax;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private IntervalsCredentials intervalsCredentials;

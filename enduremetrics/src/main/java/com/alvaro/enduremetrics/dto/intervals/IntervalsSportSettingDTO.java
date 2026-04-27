@@ -7,6 +7,9 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record IntervalsSportSettingDTO(
+
+        @JsonProperty("id")
+        Long id,
         List<String> types,
         Integer ftp,
         //Mapeamos el umbral de lactato
@@ -15,5 +18,7 @@ public record IntervalsSportSettingDTO(
         //Mapeamos la frecuencia cardíaca
         @JsonProperty("max_hr")
         Integer fcm
+
+
 ) {
 }
