@@ -22,5 +22,4 @@ public interface EntrenamientoRepository extends JpaRepository<Entrenamiento, Lo
             LocalDateTime fin
     );
 
-    List<Entrenamiento> findByUsuarioAndTipoAndFechaAfter(Usuario usuario, String tipo, LocalDate fechaLimite);
 }

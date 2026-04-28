@@ -14,8 +14,8 @@ public interface EntrenamientoCarreraRepository extends JpaRepository<Entrenamie
 
     @Query("SELECT e FROM EntrenamientoCarrera e " +
             "WHERE e.usuario = :usuario " +
-            "AND e.fecha >= :fechaDesde " +
-            "ORDER BY e.fecha DESC")
+            "AND e.fechaInicio >= :fechaDesde " +
+            "ORDER BY e.fechaInicio DESC")
     List<EntrenamientoCarrera> buscarCarrerasRecientes(
             @Param("usuario") Usuario usuario,
             @Param("fechaDesde") LocalDate fechaDesde
