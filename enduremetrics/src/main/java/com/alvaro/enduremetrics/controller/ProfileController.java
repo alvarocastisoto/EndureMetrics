@@ -58,12 +58,6 @@ public class ProfileController {
     private Button btnEliminarZapatilla;
     @FXML
     private TableColumn<Zapatilla, Double> colKmMaximos;
-    @FXML
-    private TextField fcMaxField;
-
-    @FXML
-    private TextField fcReposoField;
-
     private final ZapatillasService zapatillasService;
     private final ZapatillasRepository zapatillasRepository;
     private final IntervalsService intervalsService;
@@ -99,8 +93,6 @@ public class ProfileController {
         if (perfil.altura() != null) alturaField.setText(perfil.altura().toString());
         if (perfil.fechaNacimiento() != null) fechaNacimientoPicker.setValue(perfil.fechaNacimiento());
         if (perfil.sexo() != null) sexoComboBox.setValue(perfil.sexo());
-        if (perfil.fcMax() != null) fcMaxField.setText(perfil.fcMax().toString());
-        if (perfil.fcReposo() != null) fcReposoField.setText(perfil.fcReposo().toString());
     }
 
     @FXML
@@ -113,16 +105,16 @@ public class ProfileController {
             Double altura = parsearNumero(alturaField.getText(), Double::valueOf); // <-- Cambiado a Double
             LocalDate fechaNac = fechaNacimientoPicker.getValue();
             String sexo = sexoComboBox.getValue();
-            Integer fcMax = parsearNumero(fcMaxField.getText(), Integer::valueOf);
-            Integer fcReposo = parsearNumero(fcReposoField.getText(), Integer::valueOf);
+
             // Montamos el DTO de base de datos
-            ProfileDTO datosActualizados = new ProfileDTO(userSession.getUsuarioLogueado().getUsername(), (altura != null ? altura.intValue() : null), fechaNac, sexo, peso,fcMax,fcReposo);
+            ProfileDTO datosActualizados = new ProfileDTO(userSession.getUsuarioLogueado().getUsername(),
+                    (altura != null ? altura.intValue() : null), fechaNac, sexo, peso);
 
             // Guardamos localmente
             profileService.actualizarPerfil(userSession.getUsuarioLogueado(), datosActualizados);
 
             // Subimos a Intervals (Le pasamos la variable altura limpia)
-            intervalsService.actualizarPerfilIntervals(userSession.getUsuarioLogueado(), peso, altura, fechaNac, sexo, fcMax, fcReposo);
+            intervalsService.actualizarPerfilIntervals(userSession.getUsuarioLogueado(), peso, altura, fechaNac, sexo);
             // Asumiendo que has creado este método en ViewUtils para cambiar textos de Labels
             ViewUtils.mostrarMensaje(mensajeLabel, "Perfil actualizado correctamente", "#27ae60");
 

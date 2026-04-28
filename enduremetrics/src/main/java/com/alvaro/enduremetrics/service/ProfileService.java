@@ -1,63 +1,41 @@
 package com.alvaro.enduremetrics.service;
 
+import java.util.UUID;
+
 import com.alvaro.enduremetrics.dto.ProfileDTO;
 import com.alvaro.enduremetrics.repository.UsuarioRepository;
-import com.alvaro.enduremetrics.session.UserSession;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alvaro.enduremetrics.entity.Usuario;
 
+import lombok.RequiredArgsConstructor;
 
 @Service
 public class ProfileService {
 
+    @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private UserSession userSession;
-
-    public ProfileService(UsuarioRepository usuarioRepository, UserSession userSession) {
-        this.usuarioRepository = usuarioRepository;
-        this.userSession = userSession;
-    }
-
-    // En tu ProfileService.java
     public ProfileDTO obtenerPerfil(Usuario usuario) {
-        // 1. Recargamos al usuario fresco desde la base de datos
-        Usuario usuarioFresco = usuarioRepository.findByUsername(usuario.getUsername())
-                .orElse(usuario);
-
-        // 2. Mapeamos con los datos reales y actualizados
         return new ProfileDTO(
-                usuarioFresco.getUsername(),
-                usuarioFresco.getAltura(),
-                usuarioFresco.getFechaNacimiento(),
-                usuarioFresco.getSexo(),
-                usuarioFresco.getPeso(),
-                usuarioFresco.getFcMax(),
-                usuarioFresco.getFcReposo()
+                usuario.getUsername(),
+                usuario.getAltura(),
+                usuario.getFechaNacimiento(),
+                usuario.getSexo(),
+                usuario.getPeso()
         );
     }
 
 
-    @Transactional
-    public void actualizarPerfil(Usuario usuarioSession, ProfileDTO dto) {
-        // 1. Cargamos el usuario de la BBDD
-        Usuario usuario = usuarioRepository.findByUsername(usuarioSession.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public Usuario actualizarPerfil(Usuario usuario, ProfileDTO profileDTO) {
+        // 1. Volcamos los datos del Record DTO a la Entidad Usuario
+        usuario.setAltura(profileDTO.altura());
+        usuario.setPeso(profileDTO.peso());
+        usuario.setFechaNacimiento(profileDTO.fechaNacimiento());
+        usuario.setSexo(profileDTO.sexo());
+        // El username no lo tocamos porque es el ID/natural y suele ser fijo
 
-        // 2. Actualizamos todos los campos (¡AQUÍ FALTABAN LAS FC!)
-        usuario.setAltura(dto.altura());
-        usuario.setPeso(dto.peso());
-        usuario.setFechaNacimiento(dto.fechaNacimiento());
-        usuario.setSexo(dto.sexo());
-
-        // --- LOS DOS SETTERS QUE TE FALTABAN ---
-        usuario.setFcMax(dto.fcMax());
-        usuario.setFcReposo(dto.fcReposo());
-
-        // 3. Guardamos en BD y refrescamos la sesión
-        usuarioRepository.save(usuario);
-        userSession.setUsuarioLogueado(usuario);
+        // 2. Ahora sí, guardamos el objeto ya actualizado
+        return usuarioRepository.save(usuario);
     }
 }
