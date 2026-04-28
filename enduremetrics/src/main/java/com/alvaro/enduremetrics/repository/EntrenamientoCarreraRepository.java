@@ -11,8 +11,7 @@ import java.util.List;
 
 public interface EntrenamientoCarreraRepository extends JpaRepository<EntrenamientoCarrera, Long> {
 
-    // Al ser un repositorio de EntrenamientoCarrera, Spring ya sabe
-    // que solo quieres registros de esa clase hija.
+
     @Query("SELECT e FROM EntrenamientoCarrera e " +
             "WHERE e.usuario = :usuario " +
             "AND e.fecha >= :fechaDesde " +
