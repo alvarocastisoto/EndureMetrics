@@ -121,6 +121,9 @@ public class MainController {
         cargarVista("/views/entrenamientos-view.fxml");
     }
 
+    public void mostrarMetricas() {
+        cargarVista("/views/metricas-view.fxml");
+    }
 
     private void cargarVista(String rutaFxml) {
         try {
@@ -133,5 +136,7 @@ public class MainController {
         }
     }
 
-    public void conectarInvervals() {cargarVista("/views/intervals-view.fxml");}
+    public void conectarInvervals() {
+        cargarVista("/views/intervals-view.fxml");
+    }
 }

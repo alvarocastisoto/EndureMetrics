@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="700.0" prefWidth="800.0" spacing="25.0" style="-fx-background-color: #f8fafc;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.alvaro.enduremetrics.controller.MetricasController">
+
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <!-- CABECERA -->
+    <VBox spacing="5.0">
+        <Label text="Métricas Fisiológicas 📈" textFill="#0f172a">
+            <font>
+                <Font name="System Bold" size="28.0" />
+            </font>
+        </Label>
+        <Label text="Basado en tus últimos 21 días de entrenamiento" textFill="#64748b">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+    </VBox>
+
+    <!-- CONTENEDOR RESPONSIVE DE TARJETAS -->
+    <FlowPane hgap="20.0" vgap="20.0" prefWrapLength="750.0">
+
+        <!-- TARJETA: VO2 MAX -->
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label text="VO2 Max Estimado" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Label>
+            <Label fx:id="vo2maxLabel" text="--.-" textFill="#2563eb">
+                <font>
+                    <Font name="System Bold" size="48.0" />
+                </font>
+            </Label>
+            <Label text="ml/kg/min" textFill="#94a3b8" />
+        </VBox>
+
+        <!-- TARJETA: PREDICCIÓN 5K -->
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label text="Predicción 5K 🏃" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Label>
+            <Label fx:id="pred5kLabel" text="--:--" textFill="#10b981">
+                <font>
+                    <Font name="System Bold" size="36.0" />
+                </font>
+            </Label>
+            <Label text="Ritmo óptimo" textFill="#94a3b8" />
+        </VBox>
+
+        <!-- TARJETA: PREDICCIÓN 10K -->
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label text="Predicción 10K 🚀" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Label>
+            <Label fx:id="pred10kLabel" text="--:--" textFill="#f59e0b">
+                <font>
+                    <Font name="System Bold" size="36.0" />
+                </font>
+            </Label>
+            <Label text="Ritmo óptimo" textFill="#94a3b8" />
+        </VBox>
+
+    </FlowPane>
+</VBox>

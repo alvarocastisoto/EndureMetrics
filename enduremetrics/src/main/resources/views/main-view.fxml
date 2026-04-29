@@ -48,33 +48,33 @@
       <AnchorPane fx:id="menuContenedor" prefWidth="260.0">
          <children>
             <VBox fx:id="menuLateral" prefWidth="260.0" spacing="10.0"
-               style="-fx-background-color: #1e293b;"
-               AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+                  style="-fx-background-color: #1e293b;"
+                  AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
                <padding>
                   <Insets bottom="25.0" left="15.0" right="15.0" top="25.0" />
                </padding>
                <children>
                   <Button onAction="#mostrarDashboard" maxWidth="1.7976931348623157E308"
-                     alignment="BASELINE_LEFT"
-                     style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
-                     text="📊  Dashboard">
+                          alignment="BASELINE_LEFT"
+                          style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
+                          text="📊  Dashboard">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Button>
 
                   <Button onAction="#conectarInvervals" maxWidth="1.7976931348623157E308" alignment="BASELINE_LEFT"
-                     style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
-                     text="⚡  Conectar Intervals">
+                          style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
+                          text="⚡  Conectar Intervals">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Button>
 
                   <Button onAction="#mostrarPerfil" maxWidth="1.7976931348623157E308"
-                     alignment="BASELINE_LEFT"
-                     style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
-                     text="👤  Mi Perfil">
+                          alignment="BASELINE_LEFT"
+                          style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
+                          text="👤  Mi Perfil">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -83,7 +83,17 @@
                   <Button onAction="#mostrarEntrenamiento" maxWidth="1.7976931348623157E308"
                           alignment="BASELINE_LEFT"
                           style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
-                          text="👤  Entrenamientos">
+                          text="🏃  Entrenamientos">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Button>
+
+                  <!-- NUEVO BOTÓN DE MÉTRICAS -->
+                  <Button onAction="#mostrarMetricas" maxWidth="1.7976931348623157E308"
+                          alignment="BASELINE_LEFT"
+                          style="-fx-background-color: transparent; -fx-text-fill: #f1f5f9; -fx-cursor: hand;"
+                          text="📈  Métricas">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -92,7 +102,7 @@
                   <VBox VBox.vgrow="ALWAYS" />
 
                   <Button onAction="#cerrarSesion" maxWidth="1.7976931348623157E308"
-                     styleClass="danger" text="Cerrar Sesión">
+                          styleClass="danger" text="Cerrar Sesión">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
