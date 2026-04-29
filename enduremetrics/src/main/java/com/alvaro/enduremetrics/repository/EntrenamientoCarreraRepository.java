@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EntrenamientoCarreraRepository extends JpaRepository<EntrenamientoCarrera, Long> {
@@ -18,6 +19,6 @@ public interface EntrenamientoCarreraRepository extends JpaRepository<Entrenamie
             "ORDER BY e.fechaInicio DESC")
     List<EntrenamientoCarrera> buscarCarrerasRecientes(
             @Param("usuario") Usuario usuario,
-            @Param("fechaDesde") LocalDate fechaDesde
+            @Param("fechaDesde") LocalDateTime fechaDesde
     );
 }
