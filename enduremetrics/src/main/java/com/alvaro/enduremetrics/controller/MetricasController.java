@@ -16,8 +16,8 @@ public class MetricasController {
     @FXML
     private Label pred10kLabel;
 
-    MetricasService metricasService;
-    UserSession userSession;
+    private final MetricasService metricasService;
+    private final UserSession userSession;
 
     public MetricasController(MetricasService metricasService, UserSession userSession) {
         this.metricasService = metricasService;
@@ -26,38 +26,29 @@ public class MetricasController {
 
     @FXML
     public void initialize() {
-        pintarMetricas();
-    }
-
-    private void pintarMetricas() {
+        // 1. Haces el cálculo pesado UNA SOLA VEZ
         Double vo2Max = metricasService.calcularVo2MaxReciente(userSession.getUsuarioLogueado());
 
+        // 2. Repartes el dato ya calculado a métodos pequeños
+        pintarVo2Max(vo2Max);
+        pintarPredicciones(vo2Max);
+    }
+
+    private void pintarVo2Max(Double vo2Max) {
         if (vo2Max != null) {
             vo2maxLabel.setText(String.format("%.1f", vo2Max));
         } else {
             vo2maxLabel.setText("--.-");
-        }
-
-
-        if (vo2Max != null) {
-            // 1. Pintamos el VO2Max
-            vo2maxLabel.setText(String.format("%.1f", vo2Max));
-
-            // 2. Calculamos y pintamos las predicciones
-            String tiempo5k = metricasService.estimarRitmo(userSession.getUsuarioLogueado(), 5000);
-            String tiempo10k = metricasService.estimarRitmo(userSession.getUsuarioLogueado(), 10000);
-
-            pred5kLabel.setText(tiempo5k);
-            pred10kLabel.setText(tiempo10k);
-
-        } else {
-            vo2maxLabel.setText("--.-");
-            pred5kLabel.setText("--:--");
-            pred10kLabel.setText("--:--");
         }
     }
 
-
+    private void pintarPredicciones(Double vo2Max) {
+        // El Service ya no va a la BD, solo hace matemáticas rápidas
+        pred5kLabel.setText(metricasService.estimarRitmo(vo2Max, 5000));
+        pred10kLabel.setText(metricasService.estimarRitmo(vo2Max, 10000));
+    }
 }
+
+
 
 

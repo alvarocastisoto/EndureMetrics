@@ -60,13 +60,12 @@ public class MetricasService {
         return sumaVo2Max / entrenosValidos;
     }
 
-    public String estimarRitmo(Usuario usuario, int distanciaMetros) {
-        Double vo2Max = calcularVo2MaxReciente(usuario);
+    public String estimarRitmo(Double vo2Max, int distanciaMetros) {
 
         if (vo2Max == null) {
             return "--:--";
         }
-        Double vVo2Max = (calcularVo2MaxReciente(usuario) - 3.5) / 0.2;
+        Double vVo2Max = (vo2Max - 3.5) / 0.2;
 
         double porcentajeSostenible;
         if (distanciaMetros == 5000) {
