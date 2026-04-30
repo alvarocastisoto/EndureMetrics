@@ -59,6 +59,40 @@ public class MetricasService {
 
         return sumaVo2Max / entrenosValidos;
     }
+
+    public String estimarRitmo(Usuario usuario, int distanciaMetros) {
+        Double vo2Max = calcularVo2MaxReciente(usuario);
+
+        if (vo2Max == null) {
+            return "--:--";
+        }
+        Double vVo2Max = (calcularVo2MaxReciente(usuario) - 3.5) / 0.2;
+
+        double porcentajeSostenible;
+        if (distanciaMetros == 5000) {
+            porcentajeSostenible = 0.95;
+        } else if (distanciaMetros == 10000) {
+            porcentajeSostenible = 0.90;
+        } else {
+            return "--:--";
+        }
+
+        Double velocidadCarrera = vVo2Max * porcentajeSostenible;
+
+        double tiempoTotalMinutos = distanciaMetros / velocidadCarrera;
+
+        int minutos = (int) tiempoTotalMinutos;
+        int segundos = (int) Math.round((tiempoTotalMinutos - minutos) * 60);
+        if (segundos == 60) {
+            minutos++;
+            segundos = 0;
+        }
+
+        return String.format("%02d:%02d", minutos, segundos);
+
+
+    }
+
 }
 
 
