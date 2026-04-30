@@ -92,6 +92,11 @@ public class MetricasService {
 
     }
 
+
+    public void calcularZonas(){
+
+    }
+
 }
 
 

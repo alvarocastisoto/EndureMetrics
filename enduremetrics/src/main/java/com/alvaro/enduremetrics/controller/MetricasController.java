@@ -47,6 +47,9 @@ public class MetricasController {
         pred5kLabel.setText(metricasService.estimarRitmo(vo2Max, 5000));
         pred10kLabel.setText(metricasService.estimarRitmo(vo2Max, 10000));
     }
+
+
+
 }
 
 
