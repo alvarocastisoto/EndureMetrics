@@ -21,4 +21,6 @@ public interface EntrenamientoCarreraRepository extends JpaRepository<Entrenamie
             @Param("usuario") Usuario usuario,
             @Param("fechaDesde") LocalDateTime fechaDesde
     );
+
+
 }

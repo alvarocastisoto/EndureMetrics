@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 public class MetricasService {
@@ -93,7 +96,51 @@ public class MetricasService {
     }
 
 
-    public void calcularZonas(){
+    public Map<String, String> calcularZonasKarvonen(Usuario usuario) {
+        Integer fcMax = usuario.getFcMax();
+        Integer fcReposo = usuario.getFcReposo();
+        if (fcMax == null || fcReposo == null) {
+            return null;
+        }
+        // Rango de latidos útiles que tiene el atleta
+        Integer rfc = fcMax - fcReposo;
+
+        Map<String, String> zonas = new LinkedHashMap<>();
+
+        double[][] rangos = {
+                {0.50, 0.60}, // Z1
+                {0.60, 0.70}, // Z2
+                {0.70, 0.80}, // Z3
+                {0.80, 0.90}, // Z4
+                {0.90, 1.00}  // Z5
+        };
+
+        for (int i = 0; i < rangos.length; i++) {
+            int min = (int) Math.round((rfc * rangos[i][0] + fcReposo));
+            int max = (int) Math.round((rfc * rangos[i][1] + fcReposo));
+            zonas.put("Z" + (i + 1), min + " - " + max + " ppm");
+        }
+
+        return zonas;
+    }
+
+    public Map<LocalDate, Double> obtenerHistoricoVo2Max(Usuario usuario){
+        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30).withHour(0).withMinute(0);
+        List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
+
+        Map<LocalDate, Double> historico = new TreeMap<>(); // TreeMap para que las fechas salgan ordenadas
+
+        for (EntrenamientoCarrera carrera : carreras) {
+            Double vo2 = calcularVo2MaxIndividual(carrera, usuario);
+            if (vo2 != null) {
+                historico.put(carrera.getFechaInicio().toLocalDate(), vo2);
+            }
+        }
+        return historico;
+    }
+
+    private Double calcularVo2MaxIndividual(EntrenamientoCarrera carrera, Usuario usuario){
+        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30).withHour(0).withMinute(0);
 
     }
 

@@ -7,24 +7,27 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <VBox prefHeight="700.0" prefWidth="800.0" spacing="25.0" style="-fx-background-color: #f8fafc;"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.alvaro.enduremetrics.controller.MetricasController">
 
     <padding>
-        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
     </padding>
 
     <!-- CABECERA -->
     <VBox spacing="5.0">
         <Label text="Métricas Fisiológicas 📈" textFill="#0f172a">
             <font>
-                <Font name="System Bold" size="28.0" />
+                <Font name="System Bold" size="28.0"/>
             </font>
         </Label>
         <Label text="Basado en tus últimos 21 días de entrenamiento" textFill="#64748b">
             <font>
-                <Font size="14.0" />
+                <Font size="14.0"/>
             </font>
         </Label>
     </VBox>
@@ -36,58 +39,87 @@
         <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
               style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
             <Label text="VO2 Max Estimado" textFill="#64748b">
                 <font>
-                    <Font name="System Bold" size="14.0" />
+                    <Font name="System Bold" size="14.0"/>
                 </font>
             </Label>
             <Label fx:id="vo2maxLabel" text="--.-" textFill="#2563eb">
                 <font>
-                    <Font name="System Bold" size="48.0" />
+                    <Font name="System Bold" size="48.0"/>
                 </font>
             </Label>
-            <Label text="ml/kg/min" textFill="#94a3b8" />
+            <Label text="ml/kg/min" textFill="#94a3b8"/>
         </VBox>
 
         <!-- TARJETA: PREDICCIÓN 5K -->
         <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
               style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
             <Label text="Predicción 5K 🏃" textFill="#64748b">
                 <font>
-                    <Font name="System Bold" size="14.0" />
+                    <Font name="System Bold" size="14.0"/>
                 </font>
             </Label>
             <Label fx:id="pred5kLabel" text="--:--" textFill="#10b981">
                 <font>
-                    <Font name="System Bold" size="36.0" />
+                    <Font name="System Bold" size="36.0"/>
                 </font>
             </Label>
-            <Label text="Ritmo óptimo" textFill="#94a3b8" />
+            <Label text="Ritmo óptimo" textFill="#94a3b8"/>
         </VBox>
 
         <!-- TARJETA: PREDICCIÓN 10K -->
         <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
               style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
             <Label text="Predicción 10K 🚀" textFill="#64748b">
                 <font>
-                    <Font name="System Bold" size="14.0" />
+                    <Font name="System Bold" size="14.0"/>
                 </font>
             </Label>
             <Label fx:id="pred10kLabel" text="--:--" textFill="#f59e0b">
                 <font>
-                    <Font name="System Bold" size="36.0" />
+                    <Font name="System Bold" size="36.0"/>
                 </font>
             </Label>
-            <Label text="Ritmo óptimo" textFill="#94a3b8" />
+            <Label text="Ritmo óptimo" textFill="#94a3b8"/>
         </VBox>
 
     </FlowPane>
+
+    <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+        <VBox spacing="10.0" prefWidth="250.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;">
+            <Label text="Zonas de Frecuencia" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+            <VBox fx:id="zonasContainer" spacing="8.0"/>
+        </VBox>
+
+        <VBox spacing="10.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;">
+            <Label text="Evolución VO2 Max (Últimos 30 días)" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+            <LineChart fx:id="vo2Chart" createSymbols="true" legendVisible="false" verticalGridLinesVisible="false">
+                <xAxis>
+                    <CategoryAxis side="BOTTOM" label="Fecha"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis side="LEFT" label="VO2 Max" forceZeroInRange="false"/>
+                </yAxis>
+            </LineChart>
+        </VBox>
+    </HBox>
 </VBox>
