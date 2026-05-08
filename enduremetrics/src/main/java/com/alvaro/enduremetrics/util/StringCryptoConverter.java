@@ -9,6 +9,7 @@ import java.util.Base64;
 @Converter
 public class StringCryptoConverter implements AttributeConverter<String, String> {
 
+    //Hardcodeada intencionalmente mientras desarrollo.
     private static final String SECRET_KEY = "EndureMetricsKey";
     private static final String ALGORITHM = "AES";
 
