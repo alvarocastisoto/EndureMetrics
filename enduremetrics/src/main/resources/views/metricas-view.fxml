@@ -24,7 +24,7 @@
                 <Font name="System Bold" size="28.0"/>
             </font>
         </Label>
-        <Label text="Basado en tus últimos 21 días de entrenamiento" textFill="#64748b">
+        <Label text="Basado en tus últimos entrenamientos" textFill="#64748b">
             <font>
                 <Font size="14.0"/>
             </font>
@@ -103,6 +103,28 @@
                 </font>
             </Label>
             <Label fx:id="trimpEstadoLabel" text="Calculando..." textFill="#94a3b8">
+                <font>
+                    <Font name="System Bold" size="12.0"/>
+                </font>
+            </Label>
+        </VBox>
+
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <Label text="Estado de Forma ⚖️" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0"/>
+                </font>
+            </Label>
+            <Label fx:id="tsbLabel" text="---" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="36.0"/>
+                </font>
+            </Label>
+            <Label fx:id="tsbEstadoLabel" text="Calculando..." textFill="#94a3b8">
                 <font>
                     <Font name="System Bold" size="12.0"/>
                 </font>
