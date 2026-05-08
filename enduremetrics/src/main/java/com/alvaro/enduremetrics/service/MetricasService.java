@@ -3,6 +3,7 @@ package com.alvaro.enduremetrics.service;
 import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
 import com.alvaro.enduremetrics.repository.EntrenamientoCarreraRepository;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -180,6 +181,66 @@ public class MetricasService {
         return trimpTotalSemana;
     }
 
+    public Double calcularTsb(Usuario usuario) {
+        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(42).withHour(0).withMinute(0);
+        List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
+
+        // Escudo inicial
+        if (usuario.getFcMax() == null || usuario.getFcReposo() == null) {
+            return 0.0;
+        }
+
+        // =========================================================
+        // FASE 1: Construir el mapa de Carga por Día (Memoria RAM)
+        // =========================================================
+        Map<LocalDate, Double> trimpPorDia = new TreeMap<>();
+
+        for (EntrenamientoCarrera carrera : carreras) {
+            Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();
+            Integer tiempoSegundos = carrera.getTiempoMovimiento();
+
+            if (tiempoSegundos == null || fcMedia == null || fcMedia <= usuario.getFcReposo()) {
+                continue;
+            }
+
+            double t = tiempoSegundos / 60.0;
+            double rfc = (double) (fcMedia - usuario.getFcReposo()) / (usuario.getFcMax() - usuario.getFcReposo());
+
+            double trimpSesion;
+            if (usuario.getSexo() != null && usuario.getSexo().equalsIgnoreCase("mujer")) {
+                trimpSesion = t * rfc * 0.64 * Math.exp(1.67 * rfc);
+            } else {
+                trimpSesion = t * rfc * 0.64 * Math.exp(1.92 * rfc);
+            }
+
+            LocalDate fechaCarrera = carrera.getFechaInicio().toLocalDate();
+
+            trimpPorDia.merge(fechaCarrera, trimpSesion, Double::sum);
+        }
+
+        Double ctlAyer = 0.0;
+        Double atlAyer = 0.0;
+        Double ctlHoy = 0.0;
+        Double atlHoy = 0.0;
+
+        // Viajamos desde hace 42 días hasta hoy (0)
+        for (int i = 42; i >= 0; i--) {
+            LocalDate fechaActual = LocalDate.now().minusDays(i);
+
+            Double trimpDelDia = trimpPorDia.getOrDefault(fechaActual, 0.0);
+
+            // Las matemáticas de desgaste siempre aplican, descanses o corras
+            ctlHoy = (trimpDelDia * (1.0 / 42.0)) + (ctlAyer * (1.0 - (1.0 / 42.0)));
+            atlHoy = (trimpDelDia * (1.0 / 7.0)) + (atlAyer * (1.0 - (1.0 / 7.0)));
+
+            // Preparamos los datos para la vuelta de mañana
+            ctlAyer = ctlHoy;
+            atlAyer = atlHoy;
+        }
+
+        // Al salir del bucle, ctlHoy y atlHoy tienen exactamente los valores de HOY
+        return ctlHoy - atlHoy;
+    }
     private Double calcularVo2MaxIndividual(EntrenamientoCarrera carrera, Usuario usuario) {
 
         Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();
