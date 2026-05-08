@@ -6,10 +6,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
-
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
+
 <VBox prefHeight="700.0" prefWidth="800.0" spacing="25.0" style="-fx-background-color: #f8fafc;"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.alvaro.enduremetrics.controller.MetricasController">
@@ -18,7 +18,6 @@
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
     </padding>
 
-    <!-- CABECERA -->
     <VBox spacing="5.0">
         <Label text="Métricas Fisiológicas 📈" textFill="#0f172a">
             <font>
@@ -32,10 +31,8 @@
         </Label>
     </VBox>
 
-    <!-- CONTENEDOR RESPONSIVE DE TARJETAS -->
     <FlowPane hgap="20.0" vgap="20.0" prefWrapLength="750.0">
 
-        <!-- TARJETA: VO2 MAX -->
         <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
               style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <padding>
@@ -54,7 +51,6 @@
             <Label text="ml/kg/min" textFill="#94a3b8"/>
         </VBox>
 
-        <!-- TARJETA: PREDICCIÓN 5K -->
         <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
               style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <padding>
@@ -73,7 +69,6 @@
             <Label text="Ritmo óptimo" textFill="#94a3b8"/>
         </VBox>
 
-        <!-- TARJETA: PREDICCIÓN 10K -->
         <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
               style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <padding>
@@ -90,6 +85,28 @@
                 </font>
             </Label>
             <Label text="Ritmo óptimo" textFill="#94a3b8"/>
+        </VBox>
+
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <Label text="Carga Semanal 🔋" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0"/>
+                </font>
+            </Label>
+            <Label fx:id="trimpLabel" text="---" textFill="#8b5cf6">
+                <font>
+                    <Font name="System Bold" size="36.0"/>
+                </font>
+            </Label>
+            <Label fx:id="trimpEstadoLabel" text="Calculando..." textFill="#94a3b8">
+                <font>
+                    <Font name="System Bold" size="12.0"/>
+                </font>
+            </Label>
         </VBox>
 
     </FlowPane>

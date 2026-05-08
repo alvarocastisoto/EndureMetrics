@@ -33,7 +33,7 @@ public class EntrenamientoMapper {
                 carrera.setLongitudZancada(dto.longitudZancada());
                 carrera.setTiempoContactoSuelo(dto.tiempoContactoSuelo());
                 if (dto.oscilacionVertical() != null) {
-                    carrera.setOscilacionVertical(dto.oscilacionVertical() / 10.0); // /10 aquí también
+                    carrera.setOscilacionVertical(dto.oscilacionVertical() / 10.0);
                 }
                 carrera.setRatioVertical(dto.ratioVertical());
 
@@ -93,12 +93,9 @@ public class EntrenamientoMapper {
             if (dto.equilibrioTcsIzquierda() != null) {
                 double izq = dto.equilibrioTcsIzquierda();
                 v.setEquilibrioTcsIzquierda(izq);
-                // Si tienes el campo en la entidad, guárdalo ya calculado:
-                // v.setEquilibrioTcsDerecha(100.0 - izq);
             }
             v.setTiempoContactoSuelo(dto.tiempoContactoSuelo());
 
-            // <-- AÑADIDO: Te faltaba mapear el equilibrio TCS en las vueltas
             v.setEquilibrioTcsIzquierda(dto.equilibrioTcsIzquierda());
             if (dto.oscilacionVertical() != null) {
                 v.setOscilacionVertical(dto.oscilacionVertical() / 10.0);

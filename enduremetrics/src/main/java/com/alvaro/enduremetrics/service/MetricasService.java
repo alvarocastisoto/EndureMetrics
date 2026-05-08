@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Service
 public class MetricasService {
@@ -25,7 +22,6 @@ public class MetricasService {
         LocalDateTime fechaLimite = LocalDateTime.now().minusDays(21).withHour(0).withMinute(0);
         List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
 
-
         if (carreras.size() < 3 || usuario.getFcMax() == null || usuario.getFcReposo() == null) {
             return null;
         }
@@ -34,33 +30,15 @@ public class MetricasService {
         int entrenosValidos = 0;
 
         for (EntrenamientoCarrera carrera : carreras) {
-            Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();
+            Double vo2MaxEstimado = calcularVo2MaxIndividual(carrera, usuario);
 
-            double tiempoMovimientoMinutos = carrera.getTiempoMovimiento() / 60.0;
-
-            if (fcMedia == null || fcMedia <= usuario.getFcReposo() || tiempoMovimientoMinutos < 15) {
-                continue;
-            }
-
-            double porcentajeRfc = (double) (fcMedia - usuario.getFcReposo()) / (usuario.getFcMax() - usuario.getFcReposo());
-
-            double metrosPorMinuto = carrera.getDistancia() / tiempoMovimientoMinutos;
-
-            double vo2Actual = (0.2 * metrosPorMinuto) + 3.5;
-            double vo2MaxEstimado = vo2Actual / porcentajeRfc;
-
-            if (vo2MaxEstimado > 20 && vo2MaxEstimado < 95) {
+            if (vo2MaxEstimado != null) {
                 sumaVo2Max += vo2MaxEstimado;
                 entrenosValidos++;
             }
         }
 
-
-        if (entrenosValidos == 0) {
-            return null;
-        }
-
-        return sumaVo2Max / entrenosValidos;
+        return entrenosValidos > 0 ? sumaVo2Max / entrenosValidos : null;
     }
 
     public String estimarRitmo(Double vo2Max, int distanciaMetros) {
@@ -124,26 +102,115 @@ public class MetricasService {
         return zonas;
     }
 
-    public Map<LocalDate, Double> obtenerHistoricoVo2Max(Usuario usuario){
+
+    public Map<LocalDate, Double> obtenerHistoricoVo2Max(Usuario usuario) {
         LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30).withHour(0).withMinute(0);
         List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
 
-        Map<LocalDate, Double> historico = new TreeMap<>(); // TreeMap para que las fechas salgan ordenadas
+        // 1. TRAMPA TEMPORAL: Le damos la vuelta a la lista para procesar de más antigua a más reciente
+        Collections.reverse(carreras);
+
+        Map<LocalDate, Double> historico = new TreeMap<>();
+
+        // 2. Variables para la Media Móvil Exponencial (EMA)
+        Double emaAnterior = null;
+        double alpha = 0.25; // Le damos un 25% de importancia al entreno de hoy y 75% al historial
 
         for (EntrenamientoCarrera carrera : carreras) {
-            Double vo2 = calcularVo2MaxIndividual(carrera, usuario);
-            if (vo2 != null) {
-                historico.put(carrera.getFechaInicio().toLocalDate(), vo2);
+            Double vo2Bruto = calcularVo2MaxIndividual(carrera, usuario);
+
+            if (vo2Bruto != null) {
+                // 3. Aplicamos la lógica EMA
+                if (emaAnterior == null) {
+                    // Si es la primera carrera válida del mes, no hay historial. El punto de partida es el valor bruto.
+                    emaAnterior = vo2Bruto;
+                } else {
+                    // Fórmula: (Hoy * 0.25) + (Ayer * 0.75)
+                    emaAnterior = (vo2Bruto * alpha) + (emaAnterior * (1.0 - alpha));
+                }
+
+                // 4. Guardamos el valor SUAVIZADO, no el bruto
+                historico.put(carrera.getFechaInicio().toLocalDate(), emaAnterior);
             }
         }
+
         return historico;
     }
 
-    private Double calcularVo2MaxIndividual(EntrenamientoCarrera carrera, Usuario usuario){
-        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30).withHour(0).withMinute(0);
 
+    public Double calcularCargaSemanalTRIMP(Usuario usuario) {
+        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(7).withHour(0).withMinute(0);
+        List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
+
+        // Escudo inicial
+        if (usuario.getFcMax() == null || usuario.getFcReposo() == null) {
+            return 0.0;
+        }
+
+        double trimpTotalSemana = 0.0;
+
+        for (EntrenamientoCarrera carrera : carreras) {
+            Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();
+            Integer tiempoSegundos = carrera.getTiempoMovimiento();
+
+            // 1. Filtro seguro: Usamos continue para no abortar toda la semana si un día falla
+            if (tiempoSegundos == null || fcMedia == null || fcMedia <= usuario.getFcReposo()) {
+                continue;
+            }
+
+            // 2. Pasamos a minutos
+            double t = tiempoSegundos / 60.0;
+
+            // 3. RFC como Double y con paréntesis correctos
+            double rfc = (double) (fcMedia - usuario.getFcReposo()) / (usuario.getFcMax() - usuario.getFcReposo());
+
+            // 4. Fórmula TRIMP de Banister
+            double trimpSesion;
+            // Comprobamos mujer explícitamente, por defecto aplicamos la constante de hombre (1.92)
+            if (usuario.getSexo() != null && usuario.getSexo().equalsIgnoreCase("mujer")) {
+                trimpSesion = t * rfc * 0.64 * Math.exp(1.67 * rfc);
+            } else {
+                trimpSesion = t * rfc * 0.64 * Math.exp(1.92 * rfc);
+            }
+
+            // Sumamos a la mochila de la semana
+            trimpTotalSemana += trimpSesion;
+        }
+
+        return trimpTotalSemana;
     }
 
+    private Double calcularVo2MaxIndividual(EntrenamientoCarrera carrera, Usuario usuario) {
+
+        Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();
+
+        // 1. Pasa los segundos a minutos (ya lo tienes de antes)
+
+        double tiempoMovimientoMinutos = carrera.getTiempoMovimiento() / 60.0;
+
+        // 2. El IF del filtro: ¿Es nula la FC? ¿Es menor que el reposo? ¿Dura menos de 15 min?
+        if (fcMedia == null || fcMedia <= usuario.getFcReposo() || tiempoMovimientoMinutos < 15) {
+            return null; // Si es basura, devolvemos nulo y listos
+        }
+
+        // 3. Matemática: porcentajeRfc
+        double porcentajeRfc = (double) (fcMedia - usuario.getFcReposo()) / (usuario.getFcMax() - usuario.getFcReposo());
+
+        // 4. Matemática: metrosPorMinuto
+        double metrosPorMinuto = carrera.getDistancia() / tiempoMovimientoMinutos;
+
+        // 5. Matemática: vo2Actual y vo2MaxEstimado
+        double vo2Actual = (0.2 * metrosPorMinuto) + 3.5;
+        double vo2MaxEstimado = vo2Actual / porcentajeRfc;
+        // 6. El filtro final de realismo humano
+        if (vo2MaxEstimado > 20 && vo2MaxEstimado < 95) {
+            return vo2MaxEstimado; // ¡Carrera válida! Devolvemos el cálculo
+        }
+
+        return null; // Si sale un número marciano, devolvemos nulo
+    }
 }
+
+
 
 
