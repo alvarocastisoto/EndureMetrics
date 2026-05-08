@@ -81,7 +81,6 @@ public class MetricasService {
         if (fcMax == null || fcReposo == null) {
             return null;
         }
-        // Rango de latidos útiles que tiene el atleta
         Integer rfc = fcMax - fcReposo;
 
         Map<String, String> zonas = new LinkedHashMap<>();
@@ -108,14 +107,12 @@ public class MetricasService {
         LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30).withHour(0).withMinute(0);
         List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
 
-        // 1. TRAMPA TEMPORAL: Le damos la vuelta a la lista para procesar de más antigua a más reciente
         Collections.reverse(carreras);
 
         Map<LocalDate, Double> historico = new TreeMap<>();
 
-        // 2. Variables para la Media Móvil Exponencial (EMA)
         Double emaAnterior = null;
-        double alpha = 0.25; // Le damos un 25% de importancia al entreno de hoy y 75% al historial
+        double alpha = 0.25;
 
         for (EntrenamientoCarrera carrera : carreras) {
             Double vo2Bruto = calcularVo2MaxIndividual(carrera, usuario);
@@ -123,14 +120,11 @@ public class MetricasService {
             if (vo2Bruto != null) {
                 // 3. Aplicamos la lógica EMA
                 if (emaAnterior == null) {
-                    // Si es la primera carrera válida del mes, no hay historial. El punto de partida es el valor bruto.
                     emaAnterior = vo2Bruto;
                 } else {
-                    // Fórmula: (Hoy * 0.25) + (Ayer * 0.75)
                     emaAnterior = (vo2Bruto * alpha) + (emaAnterior * (1.0 - alpha));
                 }
 
-                // 4. Guardamos el valor SUAVIZADO, no el bruto
                 historico.put(carrera.getFechaInicio().toLocalDate(), emaAnterior);
             }
         }
@@ -143,7 +137,6 @@ public class MetricasService {
         LocalDateTime fechaLimite = LocalDateTime.now().minusDays(7).withHour(0).withMinute(0);
         List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
 
-        // Escudo inicial
         if (usuario.getFcMax() == null || usuario.getFcReposo() == null) {
             return 0.0;
         }
@@ -154,20 +147,15 @@ public class MetricasService {
             Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();
             Integer tiempoSegundos = carrera.getTiempoMovimiento();
 
-            // 1. Filtro seguro: Usamos continue para no abortar toda la semana si un día falla
             if (tiempoSegundos == null || fcMedia == null || fcMedia <= usuario.getFcReposo()) {
                 continue;
             }
 
-            // 2. Pasamos a minutos
             double t = tiempoSegundos / 60.0;
 
-            // 3. RFC como Double y con paréntesis correctos
             double rfc = (double) (fcMedia - usuario.getFcReposo()) / (usuario.getFcMax() - usuario.getFcReposo());
 
-            // 4. Fórmula TRIMP de Banister
             double trimpSesion;
-            // Comprobamos mujer explícitamente, por defecto aplicamos la constante de hombre (1.92)
             if (usuario.getSexo() != null && usuario.getSexo().equalsIgnoreCase("mujer")) {
                 trimpSesion = t * rfc * 0.64 * Math.exp(1.67 * rfc);
             } else {
@@ -185,14 +173,11 @@ public class MetricasService {
         LocalDateTime fechaLimite = LocalDateTime.now().minusDays(42).withHour(0).withMinute(0);
         List<EntrenamientoCarrera> carreras = carreraRepository.buscarCarrerasRecientes(usuario, fechaLimite);
 
-        // Escudo inicial
         if (usuario.getFcMax() == null || usuario.getFcReposo() == null) {
             return 0.0;
         }
 
-        // =========================================================
-        // FASE 1: Construir el mapa de Carga por Día (Memoria RAM)
-        // =========================================================
+
         Map<LocalDate, Double> trimpPorDia = new TreeMap<>();
 
         for (EntrenamientoCarrera carrera : carreras) {
@@ -223,22 +208,18 @@ public class MetricasService {
         Double ctlHoy = 0.0;
         Double atlHoy = 0.0;
 
-        // Viajamos desde hace 42 días hasta hoy (0)
         for (int i = 42; i >= 0; i--) {
             LocalDate fechaActual = LocalDate.now().minusDays(i);
 
             Double trimpDelDia = trimpPorDia.getOrDefault(fechaActual, 0.0);
 
-            // Las matemáticas de desgaste siempre aplican, descanses o corras
             ctlHoy = (trimpDelDia * (1.0 / 42.0)) + (ctlAyer * (1.0 - (1.0 / 42.0)));
             atlHoy = (trimpDelDia * (1.0 / 7.0)) + (atlAyer * (1.0 - (1.0 / 7.0)));
 
-            // Preparamos los datos para la vuelta de mañana
             ctlAyer = ctlHoy;
             atlAyer = atlHoy;
         }
 
-        // Al salir del bucle, ctlHoy y atlHoy tienen exactamente los valores de HOY
         return ctlHoy - atlHoy;
     }
     private Double calcularVo2MaxIndividual(EntrenamientoCarrera carrera, Usuario usuario) {
