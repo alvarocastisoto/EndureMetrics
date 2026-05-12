@@ -1,7 +1,9 @@
 package com.alvaro.enduremetrics.controller;
 
 import java.io.IOException;
+import java.util.List;
 
+import com.alvaro.enduremetrics.dto.intervals.IntervalsActivityDTO;
 import com.alvaro.enduremetrics.service.IntervalsService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,7 @@ public class LoginController {
     private final LoginService loginService;
     private final UserSession userSession;
     private final IntervalsService intervalsService;
+
     public LoginController(ApplicationContext springContext, LoginService loginService, UserSession userSession, IntervalsService intervalsService) {
         this.springContext = springContext;
         this.loginService = loginService;
@@ -89,45 +92,44 @@ public class LoginController {
             javafx.concurrent.Task<Void> tareaSincronizacion = new javafx.concurrent.Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    // ESTO ES LO QUE TARDA: Peticiones HTTP y guardado en BBDD
-                    intervalsService.sincronizacionBackground(usuarioLogueado);
+                    List<IntervalsActivityDTO> historial = intervalsService.descargaHistorialActividades(usuarioLogueado);
+
+                    if (historial != null && !historial.isEmpty()) {
+                        intervalsService.guardarHistorialEnBD(usuarioLogueado, historial);
+                    }
+
                     return null;
                 }
             };
 
             // 4. Qué hacer cuando la API termine con éxito (Volver al Hilo UI)
             tareaSincronizacion.setOnSucceeded(event -> {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/main-view.fxml"));
-                    loader.setControllerFactory(springContext::getBean);
-                    Parent root = loader.load();
-                    Stage stage = (Stage) usernameField.getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.setMaximized(true);
-                    stage.centerOnScreen();
-                } catch (IOException e) {
-                    mostrarError(null, "Error al cargar la pantalla principal.");
-                    e.printStackTrace();
-                }
+                System.out.println("Sincronización silenciosa completada con éxito.");
             });
 
-            // 5. Qué hacer si la API de Intervals falla (ej. sin internet)
+            // 5. Qué hacer si falla
             tareaSincronizacion.setOnFailed(event -> {
-                errorLabel.setTextFill(javafx.scene.paint.Color.web("#e67e22")); // Naranja aviso
-                mostrarError(null, "Fallo al sincronizar. Entrando en modo local...");
-
-                // Opcional: Podrías redirigirlo al main-view igualmente copiando el bloque try-catch de arriba
-                // para que use la app offline.
                 tareaSincronizacion.getException().printStackTrace();
-
-                // Desbloqueamos los campos por si quiere reintentar
-                usernameField.setDisable(false);
-                passwordField.setDisable(false);
+                System.out.println("Fallo al sincronizar en background. El usuario usará datos locales.");
             });
+
 
             // 6. ¡Arrancar el hilo!
-            new Thread(tareaSincronizacion).start();
-
+            Thread hiloSync = new Thread(tareaSincronizacion);
+            hiloSync.setDaemon(true); // Si cierras JavaFX, este hilo muere con él. Vital.
+            hiloSync.start();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/main-view.fxml"));
+                loader.setControllerFactory(springContext::getBean);
+                Parent root = loader.load();
+                Stage stage = (Stage) usernameField.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setMaximized(true);
+                stage.centerOnScreen();
+            } catch (IOException e) {
+                mostrarError(null, "Error al cargar la pantalla principal.");
+                e.printStackTrace();
+            }
         } catch (IllegalArgumentException e) {
             // Aquí atrapamos el error "Usuario o contraseña incorrectos" del Service
             mostrarError(null, e.getMessage());
