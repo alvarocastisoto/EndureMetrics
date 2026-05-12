@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EntrenamientoCarreraRepository extends JpaRepository<EntrenamientoCarrera, Long> {
 
@@ -21,6 +22,9 @@ public interface EntrenamientoCarreraRepository extends JpaRepository<Entrenamie
             @Param("usuario") Usuario usuario,
             @Param("fechaDesde") LocalDateTime fechaDesde
     );
+
+    @Query("SELECT MAX(c.fechaInicio) FROM EntrenamientoCarrera c WHERE c.usuario = :usuario")
+    Optional<LocalDateTime> buscarFechaUltimoEntrenamiento(@Param("usuario") Usuario usuario);
 
 
 }

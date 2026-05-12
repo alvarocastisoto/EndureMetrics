@@ -7,6 +7,7 @@ import com.alvaro.enduremetrics.entity.entrenamiento.Entrenamiento;
 import com.alvaro.enduremetrics.entity.entrenamiento.EntrenamientoCarrera;
 import com.alvaro.enduremetrics.entity.entrenamiento.VueltaCarrera;
 import com.alvaro.enduremetrics.mapper.EntrenamientoMapper;
+import com.alvaro.enduremetrics.repository.EntrenamientoCarreraRepository;
 import com.alvaro.enduremetrics.repository.EntrenamientoRepository;
 import com.alvaro.enduremetrics.repository.IntervalsRepository;
 import com.alvaro.enduremetrics.repository.UsuarioRepository;
@@ -19,9 +20,11 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class IntervalsService {
@@ -32,8 +35,9 @@ public class IntervalsService {
     private final UserSession userSession;
     private final EntrenamientoRepository entrenamientoRepository;
     private final EntrenamientoMapper mapper;
+    private final EntrenamientoCarreraRepository carreraRepository;
 
-    public IntervalsService(IntervalsRepository credentialsRepository, UsuarioRepository usuarioRepository, UserSession userSession, EntrenamientoRepository entrenamientoRepository, EntrenamientoMapper mapper) {
+    public IntervalsService(IntervalsRepository credentialsRepository, UsuarioRepository usuarioRepository, UserSession userSession, EntrenamientoRepository entrenamientoRepository, EntrenamientoMapper mapper, EntrenamientoCarreraRepository carreraRepository) {
         this.credentialsRepository = credentialsRepository;
         this.usuarioRepository = usuarioRepository;
         this.userSession = userSession;
@@ -42,6 +46,7 @@ public class IntervalsService {
         this.restClient = RestClient.builder()
                 .baseUrl("https://intervals.icu/api/v1")
                 .build();
+        this.carreraRepository = carreraRepository;
     }
 
     @Transactional // Vital para asegurar que toda la operación ocurre en una sola conexión a BD
@@ -230,9 +235,12 @@ public class IntervalsService {
 
 
     public List<IntervalsActivityDTO> descargaHistorialActividades(Usuario usuarioSession) {
-
+        // 1. Obtener el usuario gestionado para evitar problemas con Hibernate (Detached Entity)
         Usuario usuarioGestionado = usuarioRepository.findByUsername(usuarioSession.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 2. Buscamos la última fecha usando el usuario gestionado
+        Optional<LocalDateTime> ultimaFecha = carreraRepository.buscarFechaUltimoEntrenamiento(usuarioGestionado);
 
         IntervalsCredentials creds = credentialsRepository.findByUsuario(usuarioGestionado)
                 .orElseThrow(() -> new RuntimeException("El usuario no tiene credenciales"));
@@ -240,19 +248,29 @@ public class IntervalsService {
         String authRaw = "API_KEY:" + creds.getIntervalsApiKey();
         String encondeAuth = Base64.getEncoder().encodeToString(authRaw.getBytes());
 
-        try {
-            System.out.println("[PULL] Descargando historial de actividades de Intervals...");
+        // 3. Lógica Delta: ¿Desde cuándo pedimos datos?
+        String oldestDate;
+        if (ultimaFecha.isPresent()) {
+            oldestDate = ultimaFecha.get().toString(); // Se formatea automático a ISO (ej. 2026-05-12T12:00:00)
+            System.out.println("[PULL] Sincronización Delta: Pidiendo desde " + oldestDate);
+        } else {
+            oldestDate = "2000-01-01T00:00:00"; // Fallback para usuario 100% nuevo
+            System.out.println("[PULL] Usuario nuevo: Descargando historial completo desde el año 2000.");
+        }
 
+        try {
             IntervalsActivityDTO[] actividadesArray = restClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/athlete/{id}/activities")
-                            .queryParam("oldest", "2000-01-01T00:00:00")
+                            // 4. Inyectamos la variable dinámica en lugar de la fecha a mano
+                            .queryParam("oldest", oldestDate)
                             .build(creds.getIntervalsId()))
                     .header("Authorization", "Basic " + encondeAuth)
                     .retrieve()
                     .body(IntervalsActivityDTO[].class);
 
             if (actividadesArray == null || actividadesArray.length == 0) {
+                System.out.println("[PULL] No hay entrenamientos nuevos en Intervals.");
                 return List.of();
             }
             System.out.println("[PULL] Éxito. Descargadas " + actividadesArray.length + " actividades");
@@ -261,7 +279,6 @@ public class IntervalsService {
             System.err.println("[PULL ERROR] Fallo al descargar actividades: " + e.getMessage());
             throw new RuntimeException("No se pudieron descargar las actividades.");
         }
-
     }
 
     public void guardarHistorialEnBD(Usuario usuarioSession, List<IntervalsActivityDTO> historial) {
