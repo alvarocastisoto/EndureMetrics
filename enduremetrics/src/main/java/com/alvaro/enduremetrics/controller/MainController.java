@@ -125,6 +125,10 @@ public class MainController {
         cargarVista("/views/metricas-view.fxml");
     }
 
+
+    public void mostrarComposicion() {
+        cargarVista("/views/composicion-view.fxml");
+    }
     private void cargarVista(String rutaFxml) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(rutaFxml));
