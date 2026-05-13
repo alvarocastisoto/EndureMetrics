@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface MetricaCorporalRepository extends JpaRepository<MetricaCorporal, Long> {
 
-    List<MetricaCorporal> findByUsuarioOrderByFechasAsc(Usuario usuario);
+    List<MetricaCorporal> findByUsuarioOrderByFechaAsc(Usuario usuario);
 
 }
