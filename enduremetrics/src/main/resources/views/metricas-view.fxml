@@ -92,6 +92,42 @@
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
+            <Label text="Predicción 21K 🏅" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0"/>
+                </font>
+            </Label>
+            <Label fx:id="pred21kLabel" text="--:--:--" textFill="#8b5cf6">
+                <font>
+                    <Font name="System Bold" size="36.0"/>
+                </font>
+            </Label>
+            <Label text="Tiempo estimado" textFill="#94a3b8"/>
+        </VBox>
+
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <Label text="Predicción 42K 👑" textFill="#64748b">
+                <font>
+                    <Font name="System Bold" size="14.0"/>
+                </font>
+            </Label>
+            <Label fx:id="pred42kLabel" text="--:--:--" textFill="#ec4899">
+                <font>
+                    <Font name="System Bold" size="36.0"/>
+                </font>
+            </Label>
+            <Label text="Tiempo estimado" textFill="#94a3b8"/>
+        </VBox>
+
+        <VBox alignment="CENTER" prefHeight="160.0" prefWidth="220.0" spacing="10.0"
+              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
             <Label text="Carga Semanal 🔋" textFill="#64748b">
                 <font>
                     <Font name="System Bold" size="14.0"/>

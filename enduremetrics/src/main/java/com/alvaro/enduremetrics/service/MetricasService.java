@@ -42,38 +42,66 @@ public class MetricasService {
         return entrenosValidos > 0 ? sumaVo2Max / entrenosValidos : null;
     }
 
-    public String estimarRitmo(Double vo2Max, int distanciaMetros) {
+    private double calcularSegundosBase(Double vo2Max, int distanciaMetros) {
+        if (vo2Max == null) return 0.0;
 
-        if (vo2Max == null) {
-            return "--:--";
-        }
         Double vVo2Max = (vo2Max - 3.5) / 0.2;
-
-        double porcentajeSostenible;
-        if (distanciaMetros == 5000) {
-            porcentajeSostenible = 0.95;
-        } else if (distanciaMetros == 10000) {
-            porcentajeSostenible = 0.90;
-        } else {
-            return "--:--";
-        }
-
+        double porcentajeSostenible = (distanciaMetros == 5000) ? 0.89 : 0.85;
         Double velocidadCarrera = vVo2Max * porcentajeSostenible;
 
-        double tiempoTotalMinutos = distanciaMetros / velocidadCarrera;
+        // Devolvemos el total exacto en segundos, sin redondear
+        return (distanciaMetros / velocidadCarrera) * 60;
+    }
 
-        int minutos = (int) tiempoTotalMinutos;
-        int segundos = (int) Math.round((tiempoTotalMinutos - minutos) * 60);
+    public String estimarRitmo(Double vo2Max, int distanciaMetros) {
+        if (vo2Max == null || (distanciaMetros != 5000 && distanciaMetros != 10000)) {
+            return "--:--";
+        }
+
+        double totalSegundos = calcularSegundosBase(vo2Max, distanciaMetros);
+
+        int minutos = (int) (totalSegundos / 60);
+        int segundos = (int) Math.round(totalSegundos % 60);
+
         if (segundos == 60) {
             minutos++;
             segundos = 0;
         }
 
         return String.format("%02d:%02d", minutos, segundos);
-
-
     }
 
+    public String predecirLargaDistancia(Double vo2Max, int distanciaObjetivo) {
+        if (vo2Max == null) {
+            return "--:--";
+        }
+
+        double tiempo10kSegundos = calcularSegundosBase(vo2Max, 10000);
+
+        double factorFatiga;
+        if (distanciaObjetivo <= 21097) {
+            factorFatiga = 1.06; // El glucógeno aguanta (Media Maratón o menos)
+        } else {
+            factorFatiga = 1.085; // Ajuste realista para el "muro" de los 42K
+        }
+
+        Double segundosPredichos = tiempo10kSegundos * Math.pow((distanciaObjetivo / 10000.0), factorFatiga);
+
+        int horas = (int) (segundosPredichos / 3600);
+        int minutos = (int) ((segundosPredichos % 3600) / 60);
+        int segundos = (int) Math.round(segundosPredichos % 60);
+        if (segundos == 60) {
+            minutos++;
+            segundos = 0;
+        }
+        if (minutos == 60) {
+            horas++;
+            minutos = 0;
+        }
+
+        return String.format("%02d:%02d:%02d", horas, minutos, segundos);
+
+    }
 
     public Map<String, String> calcularZonasKarvonen(Usuario usuario) {
         Integer fcMax = usuario.getFcMax();
@@ -222,6 +250,7 @@ public class MetricasService {
 
         return ctlHoy - atlHoy;
     }
+
     private Double calcularVo2MaxIndividual(EntrenamientoCarrera carrera, Usuario usuario) {
 
         Integer fcMedia = carrera.getFrecuenciaCardiacaMedia();

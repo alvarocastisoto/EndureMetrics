@@ -21,6 +21,8 @@ public class MetricasController {
     @FXML private Label vo2maxLabel;
     @FXML private Label pred5kLabel;
     @FXML private Label pred10kLabel;
+    @FXML private Label pred21kLabel;
+    @FXML private Label pred42kLabel;
 
     @FXML private Label trimpLabel;
     @FXML private Label trimpEstadoLabel;
@@ -70,6 +72,8 @@ public class MetricasController {
     private void pintarPredicciones(Double vo2Max) {
         pred5kLabel.setText(metricasService.estimarRitmo(vo2Max, 5000));
         pred10kLabel.setText(metricasService.estimarRitmo(vo2Max, 10000));
+        pred21kLabel.setText(metricasService.predecirLargaDistancia(vo2Max, 21097));
+        pred42kLabel.setText(metricasService.predecirLargaDistancia(vo2Max, 42195));
     }
 
     private void pintarCargaSemanal(Usuario usuario) {
