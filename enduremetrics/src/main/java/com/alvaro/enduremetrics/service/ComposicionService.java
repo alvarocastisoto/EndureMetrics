@@ -6,6 +6,8 @@ import com.alvaro.enduremetrics.repository.MetricaCorporalRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ComposicionService {
@@ -34,10 +36,16 @@ public class ComposicionService {
                 cintura,
                 cadera
         );
-
+        Optional<MetricaCorporal> metricaHoy = metricaCorporalRepository.findByUsuarioAndFecha(usuario, LocalDate.now());
         MetricaCorporal nuevaMetrica = new MetricaCorporal();
-        nuevaMetrica.setUsuario(usuario);
-        nuevaMetrica.setFecha(LocalDate.now()); // Fecha de hoy
+
+        if(metricaHoy.isPresent()){
+            nuevaMetrica = metricaHoy.get();
+        }else{
+            nuevaMetrica = new MetricaCorporal();
+            nuevaMetrica.setUsuario(usuario);
+            nuevaMetrica.setFecha(LocalDate.now());
+        }
         nuevaMetrica.setPeso(peso);
         nuevaMetrica.setCuello(cuello);
         nuevaMetrica.setCintura(cintura);
@@ -46,6 +54,13 @@ public class ComposicionService {
 
         metricaCorporalRepository.save(nuevaMetrica);
     }
+
+
+    public List<MetricaCorporal> obtenerHistoricoReciente(Usuario usuario){
+        LocalDate fechaLimite = LocalDate.now().minusMonths(3);
+        return metricaCorporalRepository.findByUsuarioAndFechaAfterOrderByFechaAsc(usuario, fechaLimite);
+    }
+
 
     private Double calcularGrasaUSNavy(String sexo, double alturaCm, double cuelloCm, double cinturaCm, double caderaCm) {
         if (alturaCm <= 0 || cuelloCm <= 0 || cinturaCm <= 0) {
@@ -68,6 +83,7 @@ public class ComposicionService {
             return null;
         }
     }
+
 
 
 }

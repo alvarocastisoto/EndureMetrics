@@ -1,14 +1,19 @@
 package com.alvaro.enduremetrics.controller;
 
+import com.alvaro.enduremetrics.entity.MetricaCorporal;
 import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.service.ComposicionService;
 import com.alvaro.enduremetrics.session.UserSession;
 import javafx.fxml.FXML;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.chart.LineChart;
+import org.springframework.data.geo.Metric;
 import org.springframework.stereotype.Controller;
+
+import java.util.List;
 
 @Controller
 public class ComposicionController {
@@ -23,7 +28,7 @@ public class ComposicionController {
 
     private final ComposicionService composicionService;
     private final UserSession userSession;
-
+    private Usuario usuarioActual;
     public ComposicionController(ComposicionService composicionService, UserSession userSession) {
         this.composicionService = composicionService;
         this.userSession = userSession;
@@ -31,15 +36,16 @@ public class ComposicionController {
 
     @FXML
     public void initialize() {
-        Usuario usuario = userSession.getUsuarioLogueado();
-
+        this.usuarioActual = userSession.getUsuarioLogueado();
         // UX: Si es hombre, ocultamos el campo cadera porque la fórmula US Navy no lo usa
-        if (usuario.getSexo() != null && usuario.getSexo().equalsIgnoreCase("hombre")) {
+        if (usuarioActual.getSexo() != null && usuarioActual.getSexo().equalsIgnoreCase("hombre")) {
             caderaContainer.setVisible(false);
             caderaContainer.setManaged(false);
         }
 
         actualizarGrafica();
+
+
     }
 
     @FXML
@@ -77,9 +83,29 @@ public class ComposicionController {
         }
     }
 
+    @FXML
     private void actualizarGrafica() {
-        // Aquí llamaremos al Service para que nos dé el histórico de MetricaCorporal
-        // y lo mapearemos a dos Series de JavaFX (una para Peso y otra para % Grasa).
-        // Lo implementaremos en cuanto me confirmes que la base compila.
+
+
+        List<MetricaCorporal> historico = composicionService.obtenerHistoricoReciente(usuarioActual);
+
+        evolucionChart.getData().clear();
+        XYChart.Series<String, Number> seriePeso = new XYChart.Series<>();
+        seriePeso.setName("Peso (kg)");
+
+        XYChart.Series<String, Number> serieGrasa = new XYChart.Series<>();
+        serieGrasa.setName("% Grasa");
+
+        for (MetricaCorporal metrica : historico) {
+            String fechaStr = metrica.getFecha().toString();
+
+            seriePeso.getData().add(new XYChart.Data<>(fechaStr, metrica.getPeso()));
+
+            if (metrica.getPorcentajeGrasa() != null) {
+                serieGrasa.getData().add(new XYChart.Data<>(fechaStr, metrica.getPorcentajeGrasa()));
+            }
+        }
+
+        evolucionChart.getData().addAll(seriePeso, serieGrasa);
     }
 }

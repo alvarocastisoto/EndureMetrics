@@ -35,6 +35,6 @@ public class MetricaCorporal {
     private Double porcentajeGrasa;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 }
