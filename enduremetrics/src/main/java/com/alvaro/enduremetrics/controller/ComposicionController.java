@@ -5,12 +5,12 @@ import com.alvaro.enduremetrics.entity.Usuario;
 import com.alvaro.enduremetrics.service.ComposicionService;
 import com.alvaro.enduremetrics.session.UserSession;
 import javafx.fxml.FXML;
+import javafx.scene.control.Tooltip;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.chart.LineChart;
-import org.springframework.data.geo.Metric;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -107,5 +107,24 @@ public class ComposicionController {
         }
 
         evolucionChart.getData().addAll(seriePeso, serieGrasa);
+
+        for (XYChart.Data<String, Number> dato : seriePeso.getData()) {
+            // Creamos el texto de la cajita
+            Tooltip tooltipPeso = new Tooltip(String.format("%.2f kg\n%s", dato.getYValue().doubleValue(), dato.getXValue()));            // Lo instalamos en el punto de la gráfica
+            Tooltip.install(dato.getNode(), tooltipPeso);
+
+            // Toque UX: Cambiamos el cursor a la "manita" al pasar por encima
+            dato.getNode().setOnMouseEntered(e -> dato.getNode().setStyle("-fx-cursor: hand;"));
+            dato.getNode().setOnMouseExited(e -> dato.getNode().setStyle(""));
+        }
+
+        // Instalamos los Tooltips para la serie de Grasa
+        for (XYChart.Data<String, Number> dato : serieGrasa.getData()) {
+            Tooltip tooltipGrasa = new Tooltip(String.format("%.2f %%\n%s", dato.getYValue().doubleValue(), dato.getXValue()));
+            Tooltip.install(dato.getNode(), tooltipGrasa);
+
+            dato.getNode().setOnMouseEntered(e -> dato.getNode().setStyle("-fx-cursor: hand;"));
+            dato.getNode().setOnMouseExited(e -> dato.getNode().setStyle(""));
+        }
     }
 }
