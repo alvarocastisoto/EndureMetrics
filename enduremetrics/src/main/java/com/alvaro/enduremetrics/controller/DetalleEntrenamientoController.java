@@ -295,8 +295,8 @@ public class DetalleEntrenamientoController {
         res.setTipoPaso("PROMEDIO/TOTAL");
 
         // --- 1. TOTALES (Sumas de la sesión) ---
-        double dTot = vueltas.stream().mapToDouble(VueltaCarrera::getDistanciaMetros).sum();
-        int tTot = vueltas.stream().mapToInt(VueltaCarrera::getTiempoSegundos).sum();
+        double dTot = vueltas.stream().mapToDouble(v -> v.getDistanciaMetros() != null ? v.getDistanciaMetros() : 0.0).sum();
+        int tTot = vueltas.stream().mapToInt(v -> v.getTiempoSegundos() != null ? v.getTiempoSegundos() : 0).sum();
         int tMovTot = vueltas.stream().mapToInt(v -> v.getTiempoMovimientoSegundos() != null ? v.getTiempoMovimientoSegundos() : 0).sum();
         int kcalTot = vueltas.stream().mapToInt(v -> v.getCalorias() != null ? v.getCalorias() : 0).sum();
         double ascTot = vueltas.stream().mapToDouble(v -> v.getAscensoTotal() != null ? v.getAscensoTotal() : 0).sum();

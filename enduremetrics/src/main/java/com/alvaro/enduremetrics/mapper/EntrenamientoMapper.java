@@ -39,6 +39,28 @@ public class EntrenamientoMapper {
 
                 carrera.setDesacopleAerobico(dto.desacopleAerobico());
 
+                if (dto.icuHrZoneTimes() != null && !dto.icuHrZoneTimes().isEmpty()) {
+                    List<Integer> zonas = dto.icuHrZoneTimes();
+                    int size = zonas.size();
+
+                    // Mapeo seguro de las 4 primeras zonas
+                    if (size > 0 && zonas.get(0) != null) carrera.setSegundosZ1(zonas.get(0));
+                    if (size > 1 && zonas.get(1) != null) carrera.setSegundosZ2(zonas.get(1));
+                    if (size > 2 && zonas.get(2) != null) carrera.setSegundosZ3(zonas.get(2));
+                    if (size > 3 && zonas.get(3) != null) carrera.setSegundosZ4(zonas.get(3));
+
+                    // Si el usuario tiene 5, 6 o 7 zonas, las sumamos todas al saco de Z5 (Alta Intensidad)
+                    if (size > 4) {
+                        int sumaAltaIntensidad = 0;
+                        for (int i = 4; i < size; i++) {
+                            if (zonas.get(i) != null) {
+                                sumaAltaIntensidad += zonas.get(i);
+                            }
+                        }
+                        carrera.setSegundosZ5(sumaAltaIntensidad);
+                    }
+                }
+
                 carrera.setVueltas(mapearVueltas(dto.vueltas(), carrera));
                 entreno = carrera;
                 break;

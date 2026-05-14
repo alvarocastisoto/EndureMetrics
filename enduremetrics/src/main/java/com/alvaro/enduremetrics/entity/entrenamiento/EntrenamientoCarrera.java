@@ -45,6 +45,21 @@ public class EntrenamientoCarrera extends Entrenamiento {
     @Column(name = "desacople_aerobico")
     private Double desacopleAerobico;
 
+    @Column(name = "segundos_z1", nullable = false, columnDefinition = "integer default 0")
+    private Integer segundosZ1 = 0;
+
+    @Column(name = "segundos_z2", nullable = false, columnDefinition = "integer default 0")
+    private Integer segundosZ2 = 0;
+
+    @Column(name = "segundos_z3", nullable = false, columnDefinition = "integer default 0")
+    private Integer segundosZ3 = 0;
+
+    @Column(name = "segundos_z4", nullable = false, columnDefinition = "integer default 0")
+    private Integer segundosZ4 = 0;
+
+    @Column(name = "segundos_z5", nullable = false, columnDefinition = "integer default 0")
+    private Integer segundosZ5 = 0;
+
     @Column(name = "ratio_vertical")
     private Double ratioVertical; // % (Oscilación / Longitud de zancada). Mide la eficiencia
 

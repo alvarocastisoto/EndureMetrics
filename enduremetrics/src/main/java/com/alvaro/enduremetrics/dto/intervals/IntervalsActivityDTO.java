@@ -21,6 +21,7 @@ public record IntervalsActivityDTO(
         @JsonProperty("icu_training_load") Integer cargaTss,
         @JsonProperty("average_heartrate") Integer frecuenciaCardiacaMedia,
         @JsonProperty("calories") Integer calorias,
+        @JsonProperty("icu_hr_zone_times") List<Integer> icuHrZoneTimes,
 
         // --- MÉTRICAS DE CARRERA / BIOMECÁNICA ---
         @JsonProperty("total_elevation_gain") Integer desnivelPositivo,
@@ -46,4 +47,5 @@ public record IntervalsActivityDTO(
         @JsonProperty("icu_intervals")
         @JsonAlias({"intervals", "laps", "device_laps"})
         List<IntervalsLapsDTO> vueltas
-) {}
+) {
+}
